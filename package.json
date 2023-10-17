@@ -1,0 +1,51 @@
+{
+	"author": {
+		"name": "Dusk Network B.V.",
+		"url": "https://dusk.network/",
+		"mail": "info@dusk.network"
+	},
+	"bugs": "https://github.com/dusk-network/dusk-wallet-js/issues",
+	"engines": {
+		"node": ">=18.0.0"
+	},
+	"files": [
+		"assets/dusk-wallet-core-0.21.0.wasm",
+		"src",
+		"!src/**/__{mocks,tests}__",
+		"!src/**/.DS_Store"
+	],
+	"homepage": "https://github.com/dusk-network/dusk-wallet-js",
+	"license": "MPL-2.0",
+	"main": "src/main.js",
+	"name": "wallet",
+	"private": true,
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/dusk-network/dusk-wallet-js.git"
+	},
+	"scripts": {
+		"docs": "del-cli ./docs && jsdoc -c jsdoc.config.json",
+		"lint": "eslint .",
+		"lint:fix": "eslint . --fix",
+		"test": "vitest --run",
+		"test:coverage": "del-cli './coverage' && vitest --run --coverage.enabled",
+		"test:watch": "vitest",
+		"typecheck": "tsc --project tsconfig.json"
+	},
+	"type": "module",
+	"version": "0.0.1",
+	"devDependencies": {
+		"@changesets/cli": "2.26.2",
+		"@dusk-network/eslint-config": "2.0.0",
+		"@types/node": "20.8.6",
+		"@vitest/coverage-v8": "0.34.6",
+		"del-cli": "5.1.0",
+		"docdash": "2.0.2",
+		"eslint": "8.51.0",
+		"eslint-plugin-import": "2.28.1",
+		"eslint-plugin-jsdoc": "46.8.2",
+		"jsdoc": "4.0.2",
+		"typescript": "5.2.2",
+		"vitest": "0.34.6"
+	}
+}

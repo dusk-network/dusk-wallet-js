@@ -1,0 +1,22 @@
+{
+	"$schema": "https://json.schemastore.org/tsconfig",
+	"display": "Node 18",
+	"_version": "18.2.0",
+	"compilerOptions": {
+		"allowJs": true,
+		"checkJs": true,
+		"esModuleInterop": true,
+		"forceConsistentCasingInFileNames": true,
+		"isolatedModules": false,
+		"lib": ["ES2023", "WebWorker"],
+		"module": "ES2022",
+		"moduleResolution": "Bundler",
+		"noEmit": true,
+		"noImplicitAny": true,
+		"resolveJsonModule": true,
+		"skipLibCheck": false,
+		"strict": true,
+		"target": "ES2022"
+	},
+	"exclude": ["node_modules"]
+}

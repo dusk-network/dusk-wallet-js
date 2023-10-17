@@ -1,0 +1,49 @@
+{
+    "docdash": {
+        "menu": {
+            "Github repository": {
+                "class": "menu-item",
+                "href": "https://github.com/dusk-network/js-utils/",
+                "target": "_blank"
+            }
+        },
+        "meta": {
+            "title": "JS Wallet",
+            "description": "JavaScript library for rusk-wallet",
+            "keyword": ""
+        },
+        "scripts": [
+            "styles/template-dusk.css",
+            "styles/prettify-dusk.css"
+        ],
+        "search": true,
+        "sort": true,
+        "typedefs": true
+    },
+    "opts": {
+        "template": "node_modules/docdash",
+        "encoding": "utf8",
+        "destination": "./docs/",
+        "recurse": true
+    },
+    "plugins": [
+        "plugins/markdown"
+    ],
+    "source": {
+        "include": ["./jsdoc.typedefs.js", "./README.md", "./src"],
+        "excludePattern": "(node_modules|__tests__|__mocks__)"
+    },
+    "tags": {
+        "allowUnknownTags": ["category"],
+        "dictionaries": ["jsdoc", "closure"]
+    },
+    "templates": {
+        "default": {
+            "staticFiles": {
+                "include": [
+                    "./static"
+                ]
+            }
+        }
+    }
+}
