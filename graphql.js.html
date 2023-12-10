@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>graphql.js - Documentation</title>
+
+    <script src="scripts/prettify/prettify.js"></script>
+    <script src="scripts/prettify/lang-css.js"></script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css">
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+<body>
+
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger" class="navicon-button x">
+  <div class="navicon"></div>
+</label>
+
+<label for="nav-trigger" class="overlay"></label>
+
+<nav>
+    <li class="nav-link nav-home-link"><a href="index.html">Home</a></li><li class="nav-heading">Classes</li><li class="nav-heading"><span class="nav-item-type type-class">C</span><span class="nav-item-name"><a href="BalanceInfo.html">BalanceInfo</a></span></li><li class="nav-heading"><span class="nav-item-type type-class">C</span><span class="nav-item-name"><a href="History.html">History</a></span></li><li class="nav-heading"><span class="nav-item-type type-class">C</span><span class="nav-item-name"><a href="NoteData.html">NoteData</a></span></li><li class="nav-heading"><span class="nav-item-type type-class">C</span><span class="nav-item-name"><a href="Wallet.html">Wallet</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Wallet.html#getBalance">getBalance</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Wallet.html#getBalance">getBalance</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Wallet.html#getPsks">getPsks</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Wallet.html#getPsks">getPsks</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Wallet.html#history">history</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Wallet.html#history">history</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Wallet.html#stake">stake</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Wallet.html#stake">stake</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Wallet.html#stakeAllow">stakeAllow</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Wallet.html#stakeAllow">stakeAllow</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Wallet.html#stakeInfo">stakeInfo</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Wallet.html#stakeInfo">stakeInfo</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Wallet.html#sync">sync</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Wallet.html#sync">sync</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Wallet.html#transfer">transfer</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Wallet.html#transfer">transfer</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Wallet.html#unstake">unstake</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Wallet.html#unstake">unstake</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Wallet.html#withdrawReward">withdrawReward</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Wallet.html#withdrawReward">withdrawReward</a></span></li><li class="nav-heading"><a href="global.html">Globals</a></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="global.html#alloc">alloc</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="global.html#call">call</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="global.html#checkIfOwned">checkIfOwned</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="global.html#decompose">decompose</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="global.html#duskToLux">duskToLux</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="global.html#execute">execute</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="global.html#fetchOpenings">fetchOpenings</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="global.html#generateRandomMnemonic">generateRandomMnemonic</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="global.html#getAndFree">getAndFree</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="global.html#getNotesRkyvSerialized">getNotesRkyvSerialized</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="global.html#getNullifiers">getNullifiers</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="global.html#getNullifiersDeserialized">getNullifiersDeserialized</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="global.html#getNullifiersRkyvSerialized">getNullifiersRkyvSerialized</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="global.html#getOpeningsSerialized">getOpeningsSerialized</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="global.html#getPsks">getPsks</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="global.html#getPublicKeyRkyvSerialized">getPublicKeyRkyvSerialized</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="global.html#getSeedFromMnemonic">getSeedFromMnemonic</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="global.html#getTreeLeafDeserialized">getTreeLeafDeserialized</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="global.html#getU64RkyvSerialized">getU64RkyvSerialized</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="global.html#getUnprovenTxVarBytes">getUnprovenTxVarBytes</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="global.html#graphQLRequest">graphQLRequest</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="global.html#jsonFromBytes">jsonFromBytes</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="global.html#luxToDusk">luxToDusk</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="global.html#numberToLittleEndianByteArray">numberToLittleEndianByteArray</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="global.html#proveTx">proveTx</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="global.html#request">request</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="global.html#responseBytes">responseBytes</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="global.html#StakeInfo">StakeInfo</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="global.html#stakeInfo">stakeInfo</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="global.html#sync">sync</a></span></li><li class="nav-item"><span class="nav-item-type type-member">M</span><span class="nav-item-name"><a href="global.html#toBytes">toBytes</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="global.html#txFromBlock">txFromBlock</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="global.html#txStatus">txStatus</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="global.html#unspentSpentNotes">unspentSpentNotes</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="global.html#waitTillAccept">waitTillAccept</a></span></li>
+</nav>
+
+<div id="main">
+    
+    <h1 class="page-title">graphql.js</h1>
+    
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>// This Source Code Form is subject to the terms of the Mozilla Public
+// License, v. 2.0. If a copy of the MPL was not distributed with this
+// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+//
+// Copyright (c) DUSK NETWORK. All rights reserved.
+
+import { request } from "./node.js";
+import { toBytes } from "./wasm.js";
+
+/**
+ * Query the graphql rusk endpoint
+ * @param {string} query graphql query in string
+ * @returns {object} response json object
+ */
+export async function graphQLRequest(query) {
+  const bytes = toBytes(query);
+
+  const req = await request(
+    bytes,
+    "gql",
+    false,
+    process.env.LOCAL_NODE,
+    "Chain",
+    "2"
+  );
+
+  const buffer = await req.arrayBuffer();
+  const response = new Uint8Array(buffer);
+
+  const json = JSON.parse(new TextDecoder().decode(response));
+
+  return json;
+}
+
+/**
+ * Check the status of the transaction on the blockchain
+ * @param {string} txid id of the transaction to check the status of
+ */
+export async function txStatus(txid, callback) {
+  await graphQLRequest(`query { tx(hash: "${txid}") { err }}`).then(
+    (response) => {
+      callback(response);
+    }
+  );
+}
+
+/**
+ * Check for tx hash in the blockchain every 1 seconds for 10 seconds
+ * @param {string} txHash the hash of the transaction to wait for
+ * @returns {Promise} promise that resolves when the tx is accepted
+ */
+export function waitTillAccept(txHash) {
+  return new Promise((resolve, reject) => {
+    let i = 0;
+
+    const interval = setInterval(async () => {
+      await txStatus(txHash, (status) => {
+        i = i + 1;
+
+        if (i > 30) {
+          reject("tx was not accepted in 10 seconds");
+        }
+
+        const remoteTxStatus = status.tx;
+        // keep polling if we don't have a status yet
+        if (remoteTxStatus) {
+          clearInterval(interval);
+          // if we have an error, reject
+          if (remoteTxStatus.err) {
+            reject("error in tx: " + status.tx.err);
+          } else {
+            // this means the tx got accepted
+            resolve();
+          }
+        }
+      });
+    }, 1000);
+  });
+}
+
+/**
+ * Get the tx info given the block height from the node
+ * @param {number} block_height
+ * @returns {Array&lt;object>} - [{raw_tx, gas_spent}]
+ */
+export async function txFromBlock(block_height) {
+  const ret = [];
+  const txRemote = await graphQLRequest(
+    `query { block(height: ${block_height}) { transactions {id, raw}}}`
+  );
+
+  for (const tx of txRemote.block.transactions) {
+    const spentTx = await graphQLRequest(
+      `query { tx(hash: \"${tx.id}\") { gasSpent, err }}`
+    );
+
+    ret.push({
+      raw_tx: tx.raw,
+      gas_spent: spentTx.tx.gasSpent,
+    });
+  }
+
+  return ret;
+}
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<br class="clear">
+
+<footer>
+    Generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.6.7</a> on Sun Dec 10 2023 07:35:50 GMT+0000 (Coordinated Universal Time) using the Minami theme.
+</footer>
+
+<script>prettyPrint();</script>
+<script src="scripts/linenumber.js"></script>
+</body>
+</html>

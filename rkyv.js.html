@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>rkyv.js - Documentation</title>
+
+    <script src="scripts/prettify/prettify.js"></script>
+    <script src="scripts/prettify/lang-css.js"></script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css">
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+<body>
+
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger" class="navicon-button x">
+  <div class="navicon"></div>
+</label>
+
+<label for="nav-trigger" class="overlay"></label>
+
+<nav>
+    <li class="nav-link nav-home-link"><a href="index.html">Home</a></li><li class="nav-heading">Classes</li><li class="nav-heading"><span class="nav-item-type type-class">C</span><span class="nav-item-name"><a href="BalanceInfo.html">BalanceInfo</a></span></li><li class="nav-heading"><span class="nav-item-type type-class">C</span><span class="nav-item-name"><a href="History.html">History</a></span></li><li class="nav-heading"><span class="nav-item-type type-class">C</span><span class="nav-item-name"><a href="NoteData.html">NoteData</a></span></li><li class="nav-heading"><span class="nav-item-type type-class">C</span><span class="nav-item-name"><a href="Wallet.html">Wallet</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Wallet.html#getBalance">getBalance</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Wallet.html#getBalance">getBalance</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Wallet.html#getPsks">getPsks</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Wallet.html#getPsks">getPsks</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Wallet.html#history">history</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Wallet.html#history">history</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Wallet.html#stake">stake</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Wallet.html#stake">stake</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Wallet.html#stakeAllow">stakeAllow</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Wallet.html#stakeAllow">stakeAllow</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Wallet.html#stakeInfo">stakeInfo</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Wallet.html#stakeInfo">stakeInfo</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Wallet.html#sync">sync</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Wallet.html#sync">sync</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Wallet.html#transfer">transfer</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Wallet.html#transfer">transfer</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Wallet.html#unstake">unstake</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Wallet.html#unstake">unstake</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Wallet.html#withdrawReward">withdrawReward</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Wallet.html#withdrawReward">withdrawReward</a></span></li><li class="nav-heading"><a href="global.html">Globals</a></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="global.html#alloc">alloc</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="global.html#call">call</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="global.html#checkIfOwned">checkIfOwned</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="global.html#decompose">decompose</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="global.html#duskToLux">duskToLux</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="global.html#execute">execute</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="global.html#fetchOpenings">fetchOpenings</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="global.html#generateRandomMnemonic">generateRandomMnemonic</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="global.html#getAndFree">getAndFree</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="global.html#getNotesRkyvSerialized">getNotesRkyvSerialized</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="global.html#getNullifiers">getNullifiers</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="global.html#getNullifiersDeserialized">getNullifiersDeserialized</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="global.html#getNullifiersRkyvSerialized">getNullifiersRkyvSerialized</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="global.html#getOpeningsSerialized">getOpeningsSerialized</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="global.html#getPsks">getPsks</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="global.html#getPublicKeyRkyvSerialized">getPublicKeyRkyvSerialized</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="global.html#getSeedFromMnemonic">getSeedFromMnemonic</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="global.html#getTreeLeafDeserialized">getTreeLeafDeserialized</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="global.html#getU64RkyvSerialized">getU64RkyvSerialized</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="global.html#getUnprovenTxVarBytes">getUnprovenTxVarBytes</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="global.html#graphQLRequest">graphQLRequest</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="global.html#jsonFromBytes">jsonFromBytes</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="global.html#luxToDusk">luxToDusk</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="global.html#numberToLittleEndianByteArray">numberToLittleEndianByteArray</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="global.html#proveTx">proveTx</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="global.html#request">request</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="global.html#responseBytes">responseBytes</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="global.html#StakeInfo">StakeInfo</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="global.html#stakeInfo">stakeInfo</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="global.html#sync">sync</a></span></li><li class="nav-item"><span class="nav-item-type type-member">M</span><span class="nav-item-name"><a href="global.html#toBytes">toBytes</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="global.html#txFromBlock">txFromBlock</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="global.html#txStatus">txStatus</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="global.html#unspentSpentNotes">unspentSpentNotes</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="global.html#waitTillAccept">waitTillAccept</a></span></li>
+</nav>
+
+<div id="main">
+    
+    <h1 class="page-title">rkyv.js</h1>
+    
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>// This Source Code Form is subject to the terms of the Mozilla Public
+// License, v. 2.0. If a copy of the MPL was not distributed with this
+// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+//
+// Copyright (c) DUSK NETWORK. All rights reserved.
+
+// This includes helper methods to rkyv serialize deserialize stuff
+import { call, jsonFromBytes } from "./wasm.js";
+/**
+ * get the tree leaf from leaf the node sent us, deserialized
+ * into notes and block height
+ * @param {WebAssembly.Exports} wasm
+ * @param {Uint8Array} leaf bytes you get from the node
+ * @returns {object} json serialized bytes of leaf (note and height)
+ */
+export function getTreeLeafDeserialized(wasm, leaf) {
+  // we want to send the data in json to walconst-core
+  const args = JSON.stringify({
+    bytes: Array.from(leaf),
+  });
+
+  const treeLeaf = jsonFromBytes(call(wasm, args, wasm.rkyv_tree_leaf));
+
+  return treeLeaf;
+}
+/**
+ * Convert a number to rkyv serialized bytes
+ * @param {WebAssembly.Exports} wasm
+ * @param {number} number we want to rkyv serialize
+ * @returns {Uint8Array} rkyv serialized bytes of the u64
+ */
+export function getU64RkyvSerialized(wasm, num) {
+  const args = JSON.stringify({
+    value: num,
+  });
+
+  const bytes = call(wasm, args, wasm.rkyv_u64);
+
+  return bytes;
+}
+/**
+ * Convert [Note] into Vec&lt;u8> which is Vec&lt;Note> rkyv serialized
+ * @param {WebAssembly.Exports} wasm
+ * @param {Array&lt;any>} notes The notes we want to rkyv serialize
+ * @returns {Uint8Array} rkyv serialized bytes of the Vec&lt;Note>
+ */
+export function getNotesRkyvSerialized(wasm, notes) {
+  const args = JSON.stringify({
+    notes: notes,
+  });
+
+  const bytes = call(wasm, args, wasm.rkyv_notes_array);
+
+  return bytes;
+}
+/**
+ * Convert Array&lt;Uint8Array> into Vec&lt;u8> which is Vec&lt;BlsScalar> rkyv serialized into a Vec&lt;u8>
+ * @param {WebAssembly.Exports} wasm
+ * @param {Array&lt;any>} bytes The bytes of the Vec&lt;BlsScalar> (nullifiers)
+ * @returns {Array&lt;Uint8Array>} rkyv serialized bytes Vec&lt;Vec&lt;u8>>
+ */
+export function getNullifiersRkyvSerialized(wasm, bytes) {
+  const args = JSON.stringify({
+    bytes: Array.from(bytes),
+  });
+
+  const result = call(wasm, args, wasm.rkyv_bls_scalar_array);
+
+  return result;
+}
+/**
+ * Convert Uint8Array into Vec&lt;Vec&lt;u8>> which is Vec&lt;BlsScalar> rkyv serialized into a Vec&lt;Vec&lt;u8>>
+ * @param {WebAssembly.Exports} wasm
+ * @param {Uint8Array} bytes The bytes of the Vec&lt;BlsScalar> (nullifiers)
+ * @returns {Array&lt;Uint8Array>} rkyv serialized bytes Vec&lt;Vec&lt;u8>>
+ */
+export function getNullifiersDeserialized(wasm, bytes) {
+  const args = JSON.stringify({
+    bytes: Array.from(bytes),
+  });
+
+  const result = jsonFromBytes(call(wasm, args, wasm.bls_scalar_array_rkyv));
+
+  return result.bytes;
+}
+
+/**
+ * Convert Array&lt;OpeningsBytes> -> Vec&lt;Openings> -> rkyv serialized Vec&lt;u8>
+ * @param {WebAssembly.Exports} wasm
+ * @param {Array&lt;Uint8Array>} bytes - Array&lt;Bytes> the bytes are rkyv serialized openings
+ * @returns {Uint8Array} rkyv serialized Vec&lt;Openings>
+ */
+export function getOpeningsSerialized(wasm, bytes) {
+  const args = JSON.stringify({
+    openings: bytes,
+  });
+
+  const result = call(wasm, args, wasm.rkyv_openings_array);
+
+  return result;
+}
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<br class="clear">
+
+<footer>
+    Generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.6.7</a> on Sun Dec 10 2023 07:35:50 GMT+0000 (Coordinated Universal Time) using the Minami theme.
+</footer>
+
+<script>prettyPrint();</script>
+<script src="scripts/linenumber.js"></script>
+</body>
+</html>

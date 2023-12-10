@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>mod.js - Documentation</title>
+
+    <script src="scripts/prettify/prettify.js"></script>
+    <script src="scripts/prettify/lang-css.js"></script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css">
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+<body>
+
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger" class="navicon-button x">
+  <div class="navicon"></div>
+</label>
+
+<label for="nav-trigger" class="overlay"></label>
+
+<nav>
+    <li class="nav-link nav-home-link"><a href="index.html">Home</a></li><li class="nav-heading">Classes</li><li class="nav-heading"><span class="nav-item-type type-class">C</span><span class="nav-item-name"><a href="BalanceInfo.html">BalanceInfo</a></span></li><li class="nav-heading"><span class="nav-item-type type-class">C</span><span class="nav-item-name"><a href="History.html">History</a></span></li><li class="nav-heading"><span class="nav-item-type type-class">C</span><span class="nav-item-name"><a href="NoteData.html">NoteData</a></span></li><li class="nav-heading"><span class="nav-item-type type-class">C</span><span class="nav-item-name"><a href="Wallet.html">Wallet</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Wallet.html#getBalance">getBalance</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Wallet.html#getBalance">getBalance</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Wallet.html#getPsks">getPsks</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Wallet.html#getPsks">getPsks</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Wallet.html#history">history</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Wallet.html#history">history</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Wallet.html#stake">stake</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Wallet.html#stake">stake</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Wallet.html#stakeAllow">stakeAllow</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Wallet.html#stakeAllow">stakeAllow</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Wallet.html#stakeInfo">stakeInfo</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Wallet.html#stakeInfo">stakeInfo</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Wallet.html#sync">sync</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Wallet.html#sync">sync</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Wallet.html#transfer">transfer</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Wallet.html#transfer">transfer</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Wallet.html#unstake">unstake</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Wallet.html#unstake">unstake</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Wallet.html#withdrawReward">withdrawReward</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Wallet.html#withdrawReward">withdrawReward</a></span></li><li class="nav-heading"><a href="global.html">Globals</a></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="global.html#alloc">alloc</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="global.html#call">call</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="global.html#checkIfOwned">checkIfOwned</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="global.html#decompose">decompose</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="global.html#duskToLux">duskToLux</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="global.html#execute">execute</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="global.html#fetchOpenings">fetchOpenings</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="global.html#generateRandomMnemonic">generateRandomMnemonic</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="global.html#getAndFree">getAndFree</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="global.html#getNotesRkyvSerialized">getNotesRkyvSerialized</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="global.html#getNullifiers">getNullifiers</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="global.html#getNullifiersDeserialized">getNullifiersDeserialized</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="global.html#getNullifiersRkyvSerialized">getNullifiersRkyvSerialized</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="global.html#getOpeningsSerialized">getOpeningsSerialized</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="global.html#getPsks">getPsks</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="global.html#getPublicKeyRkyvSerialized">getPublicKeyRkyvSerialized</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="global.html#getSeedFromMnemonic">getSeedFromMnemonic</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="global.html#getTreeLeafDeserialized">getTreeLeafDeserialized</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="global.html#getU64RkyvSerialized">getU64RkyvSerialized</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="global.html#getUnprovenTxVarBytes">getUnprovenTxVarBytes</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="global.html#graphQLRequest">graphQLRequest</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="global.html#jsonFromBytes">jsonFromBytes</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="global.html#luxToDusk">luxToDusk</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="global.html#numberToLittleEndianByteArray">numberToLittleEndianByteArray</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="global.html#proveTx">proveTx</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="global.html#request">request</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="global.html#responseBytes">responseBytes</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="global.html#StakeInfo">StakeInfo</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="global.html#stakeInfo">stakeInfo</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="global.html#sync">sync</a></span></li><li class="nav-item"><span class="nav-item-type type-member">M</span><span class="nav-item-name"><a href="global.html#toBytes">toBytes</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="global.html#txFromBlock">txFromBlock</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="global.html#txStatus">txStatus</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="global.html#unspentSpentNotes">unspentSpentNotes</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="global.html#waitTillAccept">waitTillAccept</a></span></li>
+</nav>
+
+<div id="main">
+    
+    <h1 class="page-title">mod.js</h1>
+    
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>// This Source Code Form is subject to the terms of the Mozilla Public
+// License, v. 2.0. If a copy of the MPL was not distributed with this
+// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+//
+// Copyright (c) DUSK NETWORK. All rights reserved.
+
+import { getPsks } from "./keys.js";
+import { duskToLux } from "./crypto.js";
+import { getBalance, BalanceInfo } from "./balance.js";
+import { transfer } from "./contracts/transfer.js";
+import { txStatus } from "./graphql.js";
+import { sync, stakeInfo, StakeInfo } from "./node.js";
+import { generateRandomMnemonic, getSeedFromMnemonic } from "./mnemonic.js";
+import {
+  stake,
+  unstake,
+  stakeAllow,
+  withdrawReward,
+} from "./contracts/stake.js";
+import { history, History } from "./history.js";
+
+// Export mnemnoic functions and other helper functions
+export { generateRandomMnemonic, getSeedFromMnemonic, txStatus };
+
+/**
+ * Construct a wallet from this function
+ *
+ * @class Wallet
+ * @type {Object}
+ * @property {WebAssembly.Exports} wasmExports The exports of the wallet-core wasm
+ * binary https://github.com/dusk-network/wallet-core
+ * @property {Uint8Array} seed The seed of the wallet
+ * @property {number} [gasLimit] The gas limit of the wallet, default is 2900000000
+ * @property {number} [gasPrice] The gas price of the wallet, default is 1
+ */
+export function Wallet(wasmExports, seed, gasLimit = 2900000000, gasPrice = 1) {
+  this.wasm = wasmExports;
+  this.seed = seed;
+  this.gasLimit = gasLimit;
+  this.gasPrice = gasPrice;
+}
+
+/**
+ * Get balance
+ * @param {string} psk - bs58 encoded public spend key of the user we want to
+ * @returns {Promise&lt;BalanceInfo>} The balance info
+ * @memberof Wallet
+ */
+Wallet.prototype.getBalance = function (psk) {
+  return getBalance(this.wasm, this.seed, psk);
+};
+
+/**
+ * Get psks for the seed
+ * @returns {Array&lt;string>} psks Psks of the first 21 address for the seed
+ */
+Wallet.prototype.getPsks = function () {
+  return getPsks(this.wasm, this.seed);
+};
+
+/**
+ * Sync the wallet
+ * @returns {Promise} promise that resolves after the sync is complete
+ */
+Wallet.prototype.sync = function () {
+  return sync(this.wasm, this.seed);
+};
+
+/**
+ * Transfer Dusk from sender psk to reciever psk
+ * @param {string} sender bs58 encoded Psk to send the dusk from
+ * @param {string} reciever bs68 encoded psk of the address who will receiver the dusk
+ * @param {number} amount Amount of DUSK to send
+ * @returns {Promise} promise that resolves after the transfer is accepted into blockchain
+ */
+Wallet.prototype.transfer = function (sender, reciever, amount) {
+  return transfer(
+    this.wasm,
+    this.seed,
+    sender,
+    reciever,
+    amount,
+    this.gasLimit,
+    this.gasPrice
+  );
+};
+
+/**
+ * Stake Dusk from the provided psk, refund to the same psk
+ * @param {string} staker bs58 encoded Psk to stake from
+ * @param {number} amount Amount of dusk to stake
+ * @returns {Promise} promise that resolves after the stake is accepted into blockchain
+ */
+Wallet.prototype.stake = async function (staker, amount) {
+  const minStake = 1000;
+  const index = this.getPsks().indexOf(staker);
+
+  if (amount &lt; minStake) {
+    throw new Error(`Stake amount needs to be above a ${minStake} dusk`);
+  }
+
+  if (!index) {
+    throw new Error("Staker psk not found");
+  }
+
+  const bal = await this.getBalance(staker);
+
+  if (bal.value &lt; minStake) {
+    throw new Error(
+      `Balance needs to be greater than min stake amount of ${minStake}`
+    );
+  } else {
+    return stake(
+      this.wasm,
+      this.seed,
+      index,
+      staker,
+      amount,
+      this.gasLimit,
+      this.gasPrice
+    );
+  }
+};
+
+/**
+ * Fetches the info of the stake if the person has staked
+ * @param {string} psk bs58 encoded Psk of the staker
+ * @returns {Promise&lt;StakeInfo>} The stake info
+ */
+Wallet.prototype.stakeInfo = async function (psk) {
+  const index = this.getPsks().indexOf(psk);
+
+  if (index &lt; 0) {
+    throw new Error("Staker psk not found");
+  }
+
+  const info = await stakeInfo(this.wasm, this.seed, index);
+
+  if (info.amount) {
+    info["amount"] = duskToLux(this.wasm, info.amount);
+  }
+
+  return info;
+};
+/**
+ * Unstake dusk from the provided psk, refund to the same psk
+ * @param {string} unstaker bs58 encoded psk to unstake from}
+ * @returns {Promise} promise that resolves after the unstake is accepted into blockchain
+ */
+Wallet.prototype.unstake = function (unstaker) {
+  const index = this.getPsks().indexOf(unstaker);
+
+  if (!index) {
+    throw new Error("psk not found");
+  }
+
+  return unstake(
+    this.wasm,
+    this.seed,
+    index,
+    unstaker,
+    this.gasLimit,
+    this.gasPrice
+  );
+};
+
+/**
+ * Allow staking dusk from the provided psk
+ * @param {string} allowStakePsk psk to allow staking from
+ * @param {string} [senderPsk] senderPsk the psk of the sender, if undefined then index 0 (default index) is used
+ * @returns {Promise} promise resolves when stake allow request is obtained
+ */
+Wallet.prototype.stakeAllow = function (allowStakePsk, senderPsk) {
+  const psks = this.getPsks();
+  const staker = psks.indexOf(allowStakePsk);
+  const sender = psks.indexOf(senderPsk);
+
+  if (staker === -1) {
+    throw new Error("staker psk not found");
+  }
+
+  if (sender === -1) {
+    return stakeAllow(
+      this.wasm,
+      this.seed,
+      staker,
+      0,
+      this.gasLimit,
+      this.gasPrice
+    );
+  } else {
+    return stakeAllow(
+      this.wasm,
+      this.seed,
+      staker,
+      sender,
+      this.gasLimit,
+      this.gasPrice
+    );
+  }
+};
+
+/**
+ * Withdraw reward
+ * @param {string} unstaker bs58 encoded psk to unstake from}
+ * @returns {Promise} promise that resolves after the unstake is accepted into blockchain
+ */
+Wallet.prototype.withdrawReward = function (psk) {
+  const index = this.getPsks().indexOf(psk);
+
+  return withdrawReward(
+    this.wasm,
+    this.seed,
+    index,
+    this.gasLimit,
+    this.gasPrice
+  );
+};
+
+/**
+ * Get the history of the wallet
+ *
+ * @param {string} psk - bs58 encoded public spend key of the user we want to fetch the history of
+ * @returns {Array&lt;History>} The history of the wallet
+ */
+Wallet.prototype.history = function (psk) {
+  return history(this.wasm, this.seed, psk);
+};
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<br class="clear">
+
+<footer>
+    Generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.6.7</a> on Sun Dec 10 2023 07:35:50 GMT+0000 (Coordinated Universal Time) using the Minami theme.
+</footer>
+
+<script>prettyPrint();</script>
+<script src="scripts/linenumber.js"></script>
+</body>
+</html>
