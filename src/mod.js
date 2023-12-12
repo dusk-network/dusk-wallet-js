@@ -22,6 +22,26 @@ import { history, History } from "./history.js";
 export { txStatus };
 
 /**
+ * Construct gas configuration from this class
+ *
+ * @class Gas
+ * @type {Object}
+ * @property {number} limit The gas limit of the wallet, default is 2900000000
+ * @property {number} price The gas price of the wallet, default is 1
+ */
+export class Gas {
+  limit = NaN;
+  price = NaN;
+
+  constructor({ limit = 2_900_000_000, price = 1 } = {}) {
+    this.limit = limit;
+    this.price = price;
+
+    Object.freeze(this);
+  }
+}
+
+/**
  * Construct a wallet from this function
  *
  * @class Wallet
@@ -29,15 +49,11 @@ export { txStatus };
  * @property {WebAssembly.Exports} wasmExports The exports of the wallet-core wasm
  * binary https://github.com/dusk-network/wallet-core
  * @property {Uint8Array} seed The seed of the wallet
- * @property {number} [gasLimit] The gas limit of the wallet, default is 2900000000
- * @property {number} [gasPrice] The gas price of the wallet, default is 1
  */
 export class Wallet {
-  constructor(wasmExports, seed, gasLimit = 2900000000, gasPrice = 1) {
+  constructor(wasmExports, seed) {
     this.wasm = wasmExports;
     this.seed = seed;
-    this.gasLimit = gasLimit;
-    this.gasPrice = gasPrice;
   }
 
   /**
@@ -71,17 +87,18 @@ export class Wallet {
    * @param {string} sender bs58 encoded Psk to send the dusk from
    * @param {string} reciever bs68 encoded psk of the address who will receiver the dusk
    * @param {number} amount Amount of DUSK to send
+   * @param {Gas} [gas] gas limit and price
    * @returns {Promise} promise that resolves after the transfer is accepted into blockchain
    */
-  transfer(sender, reciever, amount) {
+  transfer(sender, reciever, amount, gas = new Gas()) {
     return transfer(
       this.wasm,
       this.seed,
       sender,
       reciever,
       amount,
-      this.gasLimit,
-      this.gasPrice
+      gas.limit,
+      gas.price
     );
   }
 
@@ -89,9 +106,10 @@ export class Wallet {
    * Stake Dusk from the provided psk, refund to the same psk
    * @param {string} staker bs58 encoded Psk to stake from
    * @param {number} amount Amount of dusk to stake
+   * @param {Gas} [gas] gas limit and price
    * @returns {Promise} promise that resolves after the stake is accepted into blockchain
    */
-  async stake(staker, amount) {
+  async stake(staker, amount, gas = new Gas()) {
     const minStake = 1000;
     const index = this.getPsks().indexOf(staker);
 
@@ -116,8 +134,8 @@ export class Wallet {
         index,
         staker,
         amount,
-        this.gasLimit,
-        this.gasPrice
+        gas.limit,
+        gas.price
       );
     }
   }
@@ -145,32 +163,27 @@ export class Wallet {
   /**
    * Unstake dusk from the provided psk, refund to the same psk
    * @param {string} unstaker bs58 encoded psk to unstake from}
+   * @param {Gas} [gas] gas limit and price
    * @returns {Promise} promise that resolves after the unstake is accepted into blockchain
    */
-  unstake(unstaker) {
+  unstake(unstaker, gas = new Gas()) {
     const index = this.getPsks().indexOf(unstaker);
 
     if (!index) {
       throw new Error("psk not found");
     }
 
-    return unstake(
-      this.wasm,
-      this.seed,
-      index,
-      unstaker,
-      this.gasLimit,
-      this.gasPrice
-    );
+    return unstake(this.wasm, this.seed, index, unstaker, gas.limit, gas.price);
   }
 
   /**
    * Allow staking dusk from the provided psk
    * @param {string} allowStakePsk psk to allow staking from
    * @param {string} [senderPsk] senderPsk the psk of the sender, if undefined then index 0 (default index) is used
+   * @param {Gas} [gas] gas limit and price
    * @returns {Promise} promise resolves when stake allow request is obtained
    */
-  stakeAllow(allowStakePsk, senderPsk) {
+  stakeAllow(allowStakePsk, senderPsk, gas = new Gas()) {
     const psks = this.getPsks();
     const staker = psks.indexOf(allowStakePsk);
     const sender = psks.indexOf(senderPsk);
@@ -180,22 +193,15 @@ export class Wallet {
     }
 
     if (sender === -1) {
-      return stakeAllow(
-        this.wasm,
-        this.seed,
-        staker,
-        0,
-        this.gasLimit,
-        this.gasPrice
-      );
+      return stakeAllow(this.wasm, this.seed, staker, 0, gas.limit, gas.price);
     } else {
       return stakeAllow(
         this.wasm,
         this.seed,
         staker,
         sender,
-        this.gasLimit,
-        this.gasPrice
+        gas.limit,
+        gas.price
       );
     }
   }
@@ -203,18 +209,13 @@ export class Wallet {
   /**
    * Withdraw reward
    * @param {string} unstaker bs58 encoded psk to unstake from}
+   * @param {Gas} [gas] gas limit and price
    * @returns {Promise} promise that resolves after the unstake is accepted into blockchain
    */
-  withdrawReward(psk) {
+  withdrawReward(psk, gas = new Gas()) {
     const index = this.getPsks().indexOf(psk);
 
-    return withdrawReward(
-      this.wasm,
-      this.seed,
-      index,
-      this.gasLimit,
-      this.gasPrice
-    );
+    return withdrawReward(this.wasm, this.seed, index, gas.limit, gas.price);
   }
 
   /**

@@ -8730,12 +8730,19 @@ async function history(wasm, seed, psk) {
 }
 
 // src/mod.js
+var Gas = class {
+  limit = NaN;
+  price = NaN;
+  constructor({ limit = 29e8, price = 1 } = {}) {
+    this.limit = limit;
+    this.price = price;
+    Object.freeze(this);
+  }
+};
 var Wallet = class {
-  constructor(wasmExports, seed, gasLimit = 29e8, gasPrice = 1) {
+  constructor(wasmExports, seed) {
     this.wasm = wasmExports;
     this.seed = seed;
-    this.gasLimit = gasLimit;
-    this.gasPrice = gasPrice;
   }
   /**
    * Get balance
@@ -8765,26 +8772,28 @@ var Wallet = class {
    * @param {string} sender bs58 encoded Psk to send the dusk from
    * @param {string} reciever bs68 encoded psk of the address who will receiver the dusk
    * @param {number} amount Amount of DUSK to send
+   * @param {Gas} [gas] gas limit and price
    * @returns {Promise} promise that resolves after the transfer is accepted into blockchain
    */
-  transfer(sender, reciever, amount) {
+  transfer(sender, reciever, amount, gas = new Gas()) {
     return transfer(
       this.wasm,
       this.seed,
       sender,
       reciever,
       amount,
-      this.gasLimit,
-      this.gasPrice
+      gas.limit,
+      gas.price
     );
   }
   /**
    * Stake Dusk from the provided psk, refund to the same psk
    * @param {string} staker bs58 encoded Psk to stake from
    * @param {number} amount Amount of dusk to stake
+   * @param {Gas} [gas] gas limit and price
    * @returns {Promise} promise that resolves after the stake is accepted into blockchain
    */
-  async stake(staker, amount) {
+  async stake(staker, amount, gas = new Gas()) {
     const minStake = 1e3;
     const index = this.getPsks().indexOf(staker);
     if (amount < minStake) {
@@ -8805,8 +8814,8 @@ var Wallet = class {
         index,
         staker,
         amount,
-        this.gasLimit,
-        this.gasPrice
+        gas.limit,
+        gas.price
       );
     }
   }
@@ -8829,29 +8838,24 @@ var Wallet = class {
   /**
    * Unstake dusk from the provided psk, refund to the same psk
    * @param {string} unstaker bs58 encoded psk to unstake from}
+   * @param {Gas} [gas] gas limit and price
    * @returns {Promise} promise that resolves after the unstake is accepted into blockchain
    */
-  unstake(unstaker) {
+  unstake(unstaker, gas = new Gas()) {
     const index = this.getPsks().indexOf(unstaker);
     if (!index) {
       throw new Error("psk not found");
     }
-    return unstake(
-      this.wasm,
-      this.seed,
-      index,
-      unstaker,
-      this.gasLimit,
-      this.gasPrice
-    );
+    return unstake(this.wasm, this.seed, index, unstaker, gas.limit, gas.price);
   }
   /**
    * Allow staking dusk from the provided psk
    * @param {string} allowStakePsk psk to allow staking from
    * @param {string} [senderPsk] senderPsk the psk of the sender, if undefined then index 0 (default index) is used
+   * @param {Gas} [gas] gas limit and price
    * @returns {Promise} promise resolves when stake allow request is obtained
    */
-  stakeAllow(allowStakePsk, senderPsk) {
+  stakeAllow(allowStakePsk, senderPsk, gas = new Gas()) {
     const psks = this.getPsks();
     const staker = psks.indexOf(allowStakePsk);
     const sender = psks.indexOf(senderPsk);
@@ -8859,39 +8863,27 @@ var Wallet = class {
       throw new Error("staker psk not found");
     }
     if (sender === -1) {
-      return stakeAllow(
-        this.wasm,
-        this.seed,
-        staker,
-        0,
-        this.gasLimit,
-        this.gasPrice
-      );
+      return stakeAllow(this.wasm, this.seed, staker, 0, gas.limit, gas.price);
     } else {
       return stakeAllow(
         this.wasm,
         this.seed,
         staker,
         sender,
-        this.gasLimit,
-        this.gasPrice
+        gas.limit,
+        gas.price
       );
     }
   }
   /**
    * Withdraw reward
    * @param {string} unstaker bs58 encoded psk to unstake from}
+   * @param {Gas} [gas] gas limit and price
    * @returns {Promise} promise that resolves after the unstake is accepted into blockchain
    */
-  withdrawReward(psk) {
+  withdrawReward(psk, gas = new Gas()) {
     const index = this.getPsks().indexOf(psk);
-    return withdrawReward(
-      this.wasm,
-      this.seed,
-      index,
-      this.gasLimit,
-      this.gasPrice
-    );
+    return withdrawReward(this.wasm, this.seed, index, gas.limit, gas.price);
   }
   /**
    * Get the history of the wallet
@@ -8904,6 +8896,7 @@ var Wallet = class {
   }
 };
 export {
+  Gas,
   Wallet,
   txStatus
 };
