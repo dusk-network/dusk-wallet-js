@@ -29,23 +29,4 @@ export function BalanceInfo(value, maximum) {
  *
  * @ignore Ignored because you only call this through the Wallet class
  */
-export async function getBalance(wasm, seed, psk) {
-  const notes = await getUnpsentNotes(psk);
-
-  const unspentNotes = notes.map((object) => object.note);
-
-  const serializedNotes = getNotesRkyvSerialized(wasm, unspentNotes);
-
-  const balanceArgs = JSON.stringify({
-    seed: Array.from(seed),
-    notes: Array.from(serializedNotes),
-  });
-
-  const obj = jsonFromBytes(call(wasm, balanceArgs, wasm.balance));
-
-  // convert the dusk values to lux
-  obj.value = duskToLux(wasm, obj.value);
-  obj.maximum = duskToLux(wasm, obj.maximum);
-
-  return obj;
-}
+export async function getBalance(wasm, seed, psk) {}

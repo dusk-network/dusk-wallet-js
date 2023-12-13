@@ -5,9 +5,5 @@
 // Copyright (c) DUSK NETWORK. All rights reserved.
 import { Dexie } from "https://unpkg.com/dexie/dist/dexie.mjs";
 import { indexedDB } from "npm:fake-indexeddb";
-import {
-  assertEquals,
-  assert,
-} from "https://deno.land/std@0.207.0/assert/mod.ts";
 
-export { Dexie, indexedDB, assertEquals, assert };
+export { Dexie, indexedDB };

@@ -8,7 +8,6 @@ import { call, jsonFromBytes } from "../wasm.js";
 import { luxToDusk } from "../crypto.js";
 import { request, stakeInfo } from "../node.js";
 import { execute } from "../execute.js";
-import { getPsks } from "../keys.js";
 
 /**
  *
@@ -242,6 +241,7 @@ export async function unstake(
  * @param {WebAssembly.Exports} wasm
  * @param {Uint8Array} seed
  * @param {number} staker_index Index of the staker
+ * @param {string} refund Where to refund this transaction to
  * @param {number} sender_index Index of the sender, if undefined we use the default one
  * @param {number} gasLimit gas limit
  * @param {number} gasPrice gas price
@@ -252,6 +252,7 @@ export async function stakeAllow(
   wasm,
   seed,
   staker_index,
+  refund,
   sender_index,
   gasLimit,
   gasPrice
@@ -261,8 +262,6 @@ export async function stakeAllow(
 
   const senderStakeinfo = await stakeInfo(wasm, seed, sender_index);
   const stakerStakeInfo = await stakeInfo(wasm, seed, staker_index);
-
-  const refund = getPsks(wasm, seed)[sender_index];
 
   let counter = 0;
 
@@ -320,6 +319,7 @@ export async function stakeAllow(
  * @param {WebAssembly.Exports} wasm
  * @param {Uint8Array} seed
  * @param {number} staker_index the index of the staker who wants to withdraw the reward
+ * @param {string} refund Where to refund this transaction to
  * @param {number} gasLimit gas limit
  * @param {number} gasPrice gas price
  *
@@ -329,6 +329,7 @@ export async function withdrawReward(
   wasm,
   seed,
   staker_index,
+  refund,
   gasLimit,
   gasPrice
 ) {
@@ -336,8 +337,6 @@ export async function withdrawReward(
   crypto.getRandomValues(rng_seed);
 
   const info = await stakeInfo(wasm, seed, staker_index);
-
-  const refund = getPsks(wasm, seed)[staker_index];
 
   // check if reward exists
   if (!info.has_staked || info.reward <= 0) {

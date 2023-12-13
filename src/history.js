@@ -7,7 +7,6 @@
 import { getAllNotes } from "./db.js";
 import { call, jsonFromBytes } from "./wasm.js";
 import { txFromBlock } from "./graphql.js";
-import { getPsks } from "./keys.js";
 
 /**
  * @class History
@@ -30,16 +29,15 @@ export function History(amount, block_height, direction, fee, id) {
  *
  * @param {WebAssembly.Exports} wasm
  * @param {Uint8Array} seed
- * @param {string} psk The psk to get the history for
+ * @param {string} psk The string of the psk to get the history for
  * @returns {Array<History>} The history of the transactions
  * @ignore Only called by the Wallet object prototype
  */
-export async function history(wasm, seed, psk) {
+export async function history(wasm, seed, psk, index) {
   const notes = await getAllNotes(psk);
 
   const txData = [];
   const noteData = [];
-  const index = getPsks(wasm, seed).indexOf(psk);
 
   for (const note of notes) {
     const blockHeight = note.block_height;

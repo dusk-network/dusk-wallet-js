@@ -12,7 +12,6 @@ import {
   getU64RkyvSerialized,
 } from "./rkyv.js";
 import { call, jsonFromBytes } from "./wasm.js";
-import { getPsks } from "./keys.js";
 import { getUnprovenTxVarBytes, proveTx } from "./tx.js";
 import { waitTillAccept } from "./graphql.js";
 

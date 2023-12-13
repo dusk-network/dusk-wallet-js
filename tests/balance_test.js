@@ -1,5 +1,9 @@
 import { Wallet } from "../dist/wallet.js"; // url_test.ts
-import { assert, assertEquals } from "../deps.js";
+import {
+  assertEquals,
+  assert,
+  assertThrows,
+} from "https://deno.land/std@0.207.0/assert/mod.ts";
 
 const DEFAULT_SEED = [
   153, 16, 102, 99, 133, 196, 55, 237, 42, 2, 163, 116, 233, 89, 10, 115, 19,
@@ -212,41 +216,6 @@ Deno.test({
   sanitizeResources: false,
   sanitizeOps: false,
 });
-
-// Deno.test({
-//   name: "random_mnemonic_test",
-//   fn() {
-//     const string = generateRandomMnemonic(exports);
-//     const words = string.split(" ");
-
-//     assertEquals(words.length, 24);
-//   },
-//   sanitizeResources: false,
-//   sanitizeOps: false,
-// });
-
-// Deno.test({
-//   name: "seed_and_passphrase_test",
-//   fn() {
-//     const seed = getSeedFromMnemonic(
-//       exports,
-//       "auction tribe type torch domain caution lyrics mouse alert fabric snake ticket",
-//       "test"
-//     );
-
-//     assertEquals(
-//       seed,
-//       [
-//         132, 194, 68, 186, 90, 80, 24, 166, 88, 8, 196, 131, 2, 20, 4, 7, 97,
-//         219, 237, 76, 4, 110, 176, 149, 79, 89, 142, 64, 76, 77, 250, 52, 50,
-//         33, 177, 84, 22, 103, 144, 135, 102, 96, 137, 151, 97, 50, 197, 232, 93,
-//         225, 249, 87, 100, 105, 100, 240, 219, 79, 64, 97, 26, 227, 185, 124,
-//       ]
-//     );
-//   },
-//   sanitizeResources: false,
-//   sanitizeOps: false,
-// });
 
 Deno.test({
   name: "tx_history_check",

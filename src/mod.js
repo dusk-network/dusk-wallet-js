@@ -4,10 +4,8 @@
 //
 // Copyright (c) DUSK NETWORK. All rights reserved.
 
-import { getPsks } from "./keys.js";
 import { duskToLux } from "./crypto.js";
 import { getBalance, BalanceInfo } from "./balance.js";
-import { transfer } from "./contracts/transfer.js";
 import { txStatus } from "./graphql.js";
 import { sync, stakeInfo, StakeInfo } from "./node.js";
 import {
@@ -17,6 +15,14 @@ import {
   withdrawReward,
 } from "./contracts/stake.js";
 import { history, History } from "./history.js";
+import { Address } from "./address.js";
+import { call, jsonFromBytes } from "./wasm.js";
+import { getUnpsentNotes } from "./db.js";
+import { getNotesRkyvSerialized } from "./rkyv.js";
+
+import { execute } from "./execute.js";
+import { luxToDusk } from "./crypto.js";
+import { underline } from "../cache/deps/https/deno.land/8b96bb522d6c7659e9cf9c34376ea9921af3d532ef37408206f533b4b9d9c885.ts";
 
 // Export mnemnoic functions and other helper functions
 export { txStatus };
@@ -46,14 +52,46 @@ export class Gas {
  *
  * @class Wallet
  * @type {Object}
- * @property {WebAssembly.Exports} wasmExports The exports of the wallet-core wasm
+ * @property {} wasmExports The exports of the wallet-core wasm
  * binary https://github.com/dusk-network/wallet-core
  * @property {Uint8Array} seed The seed of the wallet
  */
 export class Wallet {
+  #addresses = undefined;
+  #availableAddresses = undefined;
+
   constructor(wasmExports, seed) {
     this.wasm = wasmExports;
     this.seed = seed;
+  }
+
+  get addresses() {
+    if (!this.#addresses) {
+      const json = JSON.stringify({
+        seed: Array.from(this.seed),
+      });
+
+      const keys = jsonFromBytes(
+        call(this.wasm, json, this.wasm.public_spend_keys)
+      ).keys.map((key) => new Address(key));
+
+      this.#availableAddresses = keys.splice(1);
+      this.#addresses = keys;
+
+      const promises = keys.map((addr) => addr.claim(this));
+
+      return Promise.all(promises).then(() => this.#addresses);
+    }
+
+    return Promise.resolve(this.#addresses);
+  }
+
+  get availableAddresses() {
+    return this.addresses.then(() => this.#availableAddresses);
+  }
+
+  get defaultAddress() {
+    return this.addresses.then(() => this.#addresses[0]);
   }
 
   /**
@@ -62,16 +100,40 @@ export class Wallet {
    * @returns {Promise<BalanceInfo>} The balance info
    * @memberof Wallet
    */
-  getBalance(psk) {
-    return getBalance(this.wasm, this.seed, psk);
+  async getBalance(psk) {
+    const wasm = this.wasm;
+    const seed = this.seed;
+
+    const notes = await getUnpsentNotes(psk);
+
+    const unspentNotes = notes.map((object) => object.note);
+
+    const serializedNotes = getNotesRkyvSerialized(wasm, unspentNotes);
+
+    const balanceArgs = JSON.stringify({
+      seed: Array.from(seed),
+      notes: Array.from(serializedNotes),
+    });
+
+    const obj = jsonFromBytes(call(wasm, balanceArgs, wasm.balance));
+
+    // convert the dusk values to lux
+    obj.value = duskToLux(wasm, obj.value);
+    obj.maximum = duskToLux(wasm, obj.maximum);
+
+    return obj;
   }
 
   /**
    * Get psks for the seed
-   * @returns {Array<string>} psks Psks of the first 21 address for the seed
+   * @returns {Array<string>} psks Psks of the first 25 address for the seed
    */
   getPsks() {
-    return getPsks(this.wasm, this.seed);
+    const json = JSON.stringify({
+      seed: Array.from(seed),
+    });
+
+    return jsonFromBytes(call(wasm, json, wasm.public_spend_keys)).keys;
   }
 
   /**
@@ -90,13 +152,30 @@ export class Wallet {
    * @param {Gas} [gas] gas limit and price
    * @returns {Promise} promise that resolves after the transfer is accepted into blockchain
    */
-  transfer(sender, reciever, amount, gas = new Gas()) {
-    return transfer(
+  transfer(sender, receiver, amount, gas = new Gas()) {
+    // convert the amount from lux to dusk
+    amount = luxToDusk(this.wasm, amount);
+
+    const output = {
+      receiver: receiver,
+      note_type: "Obfuscated",
+      // TODO: generate ref_id(s)
+      ref_id: 1,
+      value: amount,
+    };
+
+    const rng_seed = new Uint8Array(32);
+    crypto.getRandomValues(rng_seed);
+
+    return execute(
       this.wasm,
       this.seed,
+      rng_seed,
       sender,
-      reciever,
-      amount,
+      output,
+      undefined,
+      undefined,
+      undefined,
       gas.limit,
       gas.price
     );
@@ -193,12 +272,21 @@ export class Wallet {
     }
 
     if (sender === -1) {
-      return stakeAllow(this.wasm, this.seed, staker, 0, gas.limit, gas.price);
+      return stakeAllow(
+        this.wasm,
+        this.seed,
+        staker,
+        psks[0],
+        0,
+        gas.limit,
+        gas.price
+      );
     } else {
       return stakeAllow(
         this.wasm,
         this.seed,
         staker,
+        senderPsk,
         sender,
         gas.limit,
         gas.price
@@ -215,7 +303,14 @@ export class Wallet {
   withdrawReward(psk, gas = new Gas()) {
     const index = this.getPsks().indexOf(psk);
 
-    return withdrawReward(this.wasm, this.seed, index, gas.limit, gas.price);
+    return withdrawReward(
+      this.wasm,
+      this.seed,
+      index,
+      psk,
+      gas.limit,
+      gas.price
+    );
   }
 
   /**

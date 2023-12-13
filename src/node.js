@@ -10,7 +10,6 @@ import {
   getNullifiersRkyvSerialized,
   getTreeLeafDeserialized,
 } from "./rkyv.js";
-import { getPublicKeyRkyvSerialized } from "./keys.js";
 import { insertSpentUnspentNotes, getLastPos, correctNotes } from "./db.js";
 import { checkIfOwned, unspentSpentNotes } from "./crypto.js";
 
@@ -253,4 +252,22 @@ function numberToLittleEndianByteArray(num) {
   }
 
   return byteArray;
+}
+
+/**
+ * Get the PublicKey rkyv serialized for a particular index
+ * needed to fetch stake
+ *
+ * @param {WebAssembly.Exports} wasm
+ * @param {Uint8Array} seed Seed of the walconst
+ * @param {number} index Index of the public spend key
+ * @returns {Uint8Array} public_key rkyv serialized
+ */
+function getPublicKeyRkyvSerialized(wasm, seed, index) {
+  const json = JSON.stringify({
+    seed: Array.from(seed),
+    index: index,
+  });
+
+  return call(wasm, json, wasm.get_public_key_rkyv_serialized);
 }
