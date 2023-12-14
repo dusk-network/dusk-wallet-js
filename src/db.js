@@ -21,7 +21,7 @@ if (globalThis.indexedDB === undefined) {
  * @property {UInt8Array} nullifier The rkyv serialized BlsScalar.
  * @property {number} pos The position of the node
  * @property {number} block_height The block height of the note
- * @property {string} psk The bs58 encoded public spend key of the note
+ * @property {Address} psk Address of the note
  */
 export function NoteData(note, psk, pos, nullifier, block_height) {
   this.note = note;
@@ -88,7 +88,7 @@ export async function insertSpentUnspentNotes(unspentNotes, spentNotes, pos) {
 /**
  * Fetch unspent notes from the IndexedDB if there are any
  *
- * @param {string} psk - bs58 encoded public spend key to fetch the unspent notes of
+ * @param {Address} psk - Address to fetch the unspent notes of
  * @returns {Promise<Array<NoteData>>} notes - unspent notes belonging to the psk
  * @ignore Only called by the sync function
  */
@@ -111,7 +111,7 @@ export async function getUnpsentNotes(psk) {
 /**
  * Fetch spent notes from the IndexedDB if there are any
  *
- * @param {string} psk bs58 encoded public spend key to fetch the unspent notes of
+ * @param {Address} psk Address to fetch the unspent notes of
  * @returns {Array<NoteData>}  spent notes of the psk
  * @ignore Only called by the sync function
  */

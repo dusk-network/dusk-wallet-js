@@ -29,12 +29,13 @@ export function History(amount, block_height, direction, fee, id) {
  *
  * @param {WebAssembly.Exports} wasm
  * @param {Uint8Array} seed
- * @param {string} psk The string of the psk to get the history for
+ * @param {Address} psk The Address psk to get the history for
  * @returns {Array<History>} The history of the transactions
  * @ignore Only called by the Wallet object prototype
  */
-export async function history(wasm, seed, psk, index) {
+export async function history(wasm, seed, psk) {
   const notes = await getAllNotes(psk);
+  const index = psk.index;
 
   const txData = [];
   const noteData = [];

@@ -21,7 +21,7 @@ import { waitTillAccept } from "./graphql.js";
  * @param {WebAssembly.Exports} wasm
  * @param {Uint8Array} seed - Walconst seed
  * @param {Uint8Array} rng_seed - Seed for the rng
- * @param {string} psk - bs58 encoded public spend key string
+ * @param {Address} psk - Address of the transaction sender
  * @param {object} output - Output note parameters
  * @param {object} callData - callData.method callData.payload callData.contract
  * @param {object} crossover - crossover.blinder crossover.value crossover.crossover
@@ -43,7 +43,7 @@ export async function execute(
   gas_limit,
   gas_price
 ) {
-  const sender_index = getPsks(wasm, seed).indexOf(psk);
+  const sender_index = psk.index;
 
   const notes = await getUnpsentNotes(psk);
 

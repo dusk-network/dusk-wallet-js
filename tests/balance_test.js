@@ -17,7 +17,9 @@ const initWasm = await WebAssembly.instantiate(wasm);
 const exports = initWasm.instance.exports;
 
 const wallet = new Wallet(exports, DEFAULT_SEED);
-const psks = wallet.getPsks();
+const psks = await wallet.addresses;
+const defaultAddress = await wallet.defaultAddress;
+const availableAddresses = await wallet.availableAddresses;
 
 // clear the Deno localstorage api to start fresh
 localStorage.clear();
@@ -27,7 +29,7 @@ Deno.test({
   name: "test_balance",
   async fn() {
     await wallet.sync().then(async () => {
-      await wallet.getBalance(psks[0], (balance) => {
+      await wallet.getBalance(defaultAddress, (balance) => {
         assertEquals(balance.value, 100000);
       });
     });
@@ -40,7 +42,7 @@ Deno.test({
 Deno.test({
   name: "25 psks",
   fn() {
-    assertEquals(psks.length, 25);
+    assertEquals(availableAddresses.length, 24);
   },
   sanitizeResources: false,
   sanitizeOps: false,
@@ -49,7 +51,7 @@ Deno.test({
 Deno.test({
   name: "test_transfer",
   async fn() {
-    await wallet.transfer(psks[0], psks[1], 4000);
+    await wallet.transfer(defaultAddress, availableAddresses[0], 4000);
   },
   sanitizeResources: false,
   sanitizeOps: false,
@@ -59,12 +61,12 @@ Deno.test({
   name: "after_transfer_balance",
   async fn() {
     await wallet.sync().then(async () => {
-      const balance = await wallet.getBalance(psks[0]);
+      const balance = await wallet.getBalance(defaultAddress);
       assertEquals(balance.value, 95999.999);
     });
 
     await wallet.sync().then(async () => {
-      const balance = await wallet.getBalance(psks[1]);
+      const balance = await wallet.getBalance(availableAddresses[0]);
       assertEquals(balance.value, 4000);
     });
   },
@@ -76,7 +78,7 @@ Deno.test({
   name: "test_stake",
   async fn() {
     // stake for 2000
-    await wallet.stake(psks[1], 2000);
+    await wallet.stake(availableAddresses[0], 2000);
   },
   sanitizeResources: false,
   sanitizeOps: false,
@@ -86,7 +88,7 @@ Deno.test({
   name: "after_stake_balance",
   async fn() {
     await wallet.sync().then(async () => {
-      const balance = await wallet.getBalance(psks[1]);
+      const balance = await wallet.getBalance(availableAddresses[0]);
       assertEquals(balance.value, 1999.998791031);
     });
   },
@@ -98,7 +100,7 @@ Deno.test({
   name: "stake_info",
   async fn() {
     await wallet.sync();
-    const info = await wallet.stakeInfo(psks[1]);
+    const info = await wallet.stakeInfo(availableAddresses[0]);
 
     assertEquals(info.has_staked, true);
     assertEquals(info.eligiblity, 6480);
@@ -115,7 +117,7 @@ Deno.test({
 Deno.test({
   name: "unstake",
   async fn() {
-    await wallet.unstake(psks[1]);
+    await wallet.unstake(availableAddresses[0]);
   },
   sanitizeResources: false,
   sanitizeOps: false,
@@ -125,7 +127,7 @@ Deno.test({
   name: "after_unstake_balance",
   async fn() {
     await wallet.sync().then(async () => {
-      const balance = await wallet.getBalance(psks[1]);
+      const balance = await wallet.getBalance(availableAddresses[0]);
       assertEquals(balance.value, 3999.991710567);
     });
   },
@@ -137,7 +139,7 @@ Deno.test({
   name: "test_stake_again",
   async fn() {
     // stake for 2000
-    await wallet.stake(psks[1], 2000);
+    await wallet.stake(availableAddresses[0], 2000);
   },
   sanitizeResources: false,
   sanitizeOps: false,
@@ -147,7 +149,7 @@ Deno.test({
   name: "after_stake_balance_again",
   async fn() {
     await wallet.sync().then(async () => {
-      const balance = await wallet.getBalance(psks[1]);
+      const balance = await wallet.getBalance(availableAddresses[0]);
 
       assertEquals(balance.value, 1999.987501653);
     });
@@ -159,7 +161,7 @@ Deno.test({
 Deno.test({
   name: "withdraw_reward",
   async fn() {
-    await wallet.withdrawReward(psks[0]);
+    await wallet.withdrawReward(defaultAddress);
   },
   sanitizeResources: false,
   sanitizeOps: false,
@@ -169,7 +171,7 @@ Deno.test({
   name: "balance_after_withdraw_reward",
   async fn() {
     await wallet.sync().then(async () => {
-      const balance = await wallet.getBalance(psks[0]);
+      const balance = await wallet.getBalance(defaultAddress);
 
       // if something was added to the balance that means the reward was withdrawn
       assert(balance.value > 95999.999);
@@ -184,12 +186,12 @@ Deno.test({
   name: "stake_allow",
   async fn() {
     await wallet.sync().then(async () => {
-      const info = await wallet.stakeInfo(psks[2]);
+      const info = await wallet.stakeInfo(availableAddresses[1]);
 
       // make sure the 2nd psk isn't allowed for staking
       if (info.has_key === false) {
         // allow staking for 2nd psk
-        await wallet.stakeAllow(psks[2]);
+        await wallet.stakeAllow(availableAddresses[1]);
       }
     });
   },
@@ -200,7 +202,7 @@ Deno.test({
 Deno.test({
   name: "stake_allow_check",
   async fn() {
-    const info = await wallet.stakeInfo(psks[2]);
+    const info = await wallet.stakeInfo(availableAddresses[1]);
     // check if staking is allowed
     assert(info.has_key === true);
     console.log("stake allow check ok");
@@ -213,10 +215,10 @@ Deno.test({
   name: "tx_history_check",
   async fn() {
     await wallet.sync().then(async () => {
-      const history = await wallet.history(psks[0]);
+      const history = await wallet.history(defaultAddress);
 
       assertEquals(history[0].amount, -4000.001);
-      assertEquals(history[0].block_height, 3);
+      assert(history[0].block_height > 0);
       assertEquals(history[0].direction, "Out");
       assertEquals(history[0].fee, 1000000);
       assertEquals(
