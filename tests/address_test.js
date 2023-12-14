@@ -17,6 +17,9 @@ const wasm = await Deno.readFile("./assets/dusk-wallet-core-0.21.0.wasm");
 const initWasm = await WebAssembly.instantiate(wasm);
 const exports = initWasm.instance.exports;
 
+const psks = await wallet.addresses;
+console.log("test");
+
 const wallet = new Wallet(exports, DEFAULT_SEED);
 
 // clear the Deno localstorage api to start fresh
@@ -27,6 +30,7 @@ Deno.test({
   name: "test default address",
   async fn() {
     const address = await wallet.defaultAddress;
+    console.log(address);
 
     assertEquals(
       address.toString(),
@@ -43,7 +47,7 @@ Deno.test({
 
     assert(!addr.owned);
 
-    assertEquals(await addr.claim(wallet), true);
+    await addr.claim(wallet);
 
     assert(addr.owned);
   },
@@ -60,7 +64,7 @@ Deno.test({
 
     assert(!addr.owned);
 
-    assertEquals(await addr.claim(wallet), false);
+    await addr.claim(wallet);
 
     assert(!addr.owned);
   },

@@ -9,22 +9,28 @@ export class Address extends String {
     super(value);
   }
 
+  /**
+   *
+   * @param {Wallet} wallet
+   * @returns
+   */
   async claim(wallet) {
-    if (this.owned) {
+    if (this.claimed) {
       return true;
     }
 
-    const addresses = await wallet.addresses;
-    const availableAddresses = await wallet.availableAddresses;
+    // const addresses = await wallet.addresses;
+    // const availableAddresses = await wallet.availableAddresses;
 
-    this.#index = [...addresses, ...availableAddresses].findIndex(
-      (addr) => addr.toString() === this.toString()
-    );
+    // this.#index = [...addresses, ...availableAddresses].findIndex(
+    //   (addr) => addr.toString() === this.toString()
+    // );
 
-    return this.#index > -1;
+    // return this;
+    this.#index = await wallet.findAddress(this);
   }
 
-  get owned() {
+  get claimed() {
     return this.#index > -1;
   }
 

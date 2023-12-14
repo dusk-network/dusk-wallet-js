@@ -58,7 +58,7 @@ export class Gas {
  */
 export class Wallet {
   #addresses = undefined;
-  #availableAddresses = undefined;
+  #activeAddressesCount = 1;
 
   constructor(wasmExports, seed) {
     this.wasm = wasmExports;
@@ -66,6 +66,8 @@ export class Wallet {
   }
 
   get addresses() {
+    let loaded = Promise.resolve();
+
     if (!this.#addresses) {
       const json = JSON.stringify({
         seed: Array.from(this.seed),
@@ -73,25 +75,28 @@ export class Wallet {
 
       const keys = jsonFromBytes(
         call(this.wasm, json, this.wasm.public_spend_keys)
-      ).keys.map((key) => new Address(key));
+      ).keys.map((key) => new Address(key).claim(this));
 
-      this.#addresses = keys;
-      this.#availableAddresses = keys.slice(1);
-
-      const promises = keys.map((addr) => addr.claim(this));
-
-      return Promise.all(promises).then(() => this.#addresses);
+      loaded = Promise.all(keys).then(
+        (addresses) => (this.#addresses = addresses)
+      );
     }
 
-    return Promise.resolve(this.#addresses);
-  }
-
-  get availableAddresses() {
-    return this.addresses.then(() => this.#availableAddresses);
+    return loaded.then(() =>
+      this.#addresses.slice(0, this.#activeAddressesCount)
+    );
   }
 
   get defaultAddress() {
     return this.addresses.then(() => this.#addresses[0]);
+  }
+
+  async findAddress(address) {
+    await this.addresses;
+
+    return this.#addresses.findIndex(
+      (addr) => addr.toString() === address.toString()
+    );
   }
 
   /**

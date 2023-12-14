@@ -8736,9 +8736,11 @@ var Wallet = class {
       const keys2 = jsonFromBytes(
         call(this.wasm, json, this.wasm.public_spend_keys)
       ).keys.map((key) => new Address(key));
+      this.#availableAddresses = keys2.splice(1);
       this.#addresses = keys2;
-      this.#availableAddresses = keys2.slice(1);
       const promises = keys2.map((addr) => addr.claim(this));
+      console.log(this.#addresses);
+      console.log(this.#availableAddresses);
       return Promise.all(promises).then(() => this.#addresses);
     }
     return Promise.resolve(this.#addresses);
