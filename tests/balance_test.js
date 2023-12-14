@@ -59,16 +59,13 @@ Deno.test({
   name: "after_transfer_balance",
   async fn() {
     await wallet.sync().then(async () => {
-      await wallet.getBalance(psks[0], (balance) => {
-        assertEquals(balance.value, 95999.999);
-      });
+      const balance = await wallet.getBalance(psks[0]);
+      assertEquals(balance.value, 95999.999);
     });
 
     await wallet.sync().then(async () => {
-      await wallet.getBalance(psks[1], (balance) => {
-        assertEquals(balance.value, 4000);
-        console.log("after transfer balance ok");
-      });
+      const balance = await wallet.getBalance(psks[1]);
+      assertEquals(balance.value, 4000);
     });
   },
   sanitizeResources: false,
@@ -89,10 +86,8 @@ Deno.test({
   name: "after_stake_balance",
   async fn() {
     await wallet.sync().then(async () => {
-      await wallet.getBalance(psks[1], (balance) => {
-        assertEquals(balance.value, 1999.998791031);
-        console.log("after stake balance ok");
-      });
+      const balance = await wallet.getBalance(psks[1]);
+      assertEquals(balance.value, 1999.998791031);
     });
   },
   sanitizeResources: false,
@@ -130,10 +125,8 @@ Deno.test({
   name: "after_unstake_balance",
   async fn() {
     await wallet.sync().then(async () => {
-      await wallet.getBalance(psks[1], (balance) => {
-        assertEquals(balance.value, 3999.991710567);
-        console.log("after unstake balance ok");
-      });
+      const balance = await wallet.getBalance(psks[1]);
+      assertEquals(balance.value, 3999.991710567);
     });
   },
   sanitizeResources: false,
@@ -154,10 +147,9 @@ Deno.test({
   name: "after_stake_balance_again",
   async fn() {
     await wallet.sync().then(async () => {
-      await wallet.getBalance(psks[1], (balance) => {
-        assertEquals(balance.value, 1999.987501653);
-        console.log("after stake balance again ok");
-      });
+      const balance = await wallet.getBalance(psks[1]);
+
+      assertEquals(balance.value, 1999.987501653);
     });
   },
   sanitizeResources: false,
@@ -177,11 +169,11 @@ Deno.test({
   name: "balance_after_withdraw_reward",
   async fn() {
     await wallet.sync().then(async () => {
-      await wallet.getBalance(psks[0], (balance) => {
-        // if something was added to the balance that means the reward was withdrawn
-        assert(balance.value > 95999.999);
-        console.log("after withdraw reward balance ok");
-      });
+      const balance = await wallet.getBalance(psks[0]);
+
+      // if something was added to the balance that means the reward was withdrawn
+      assert(balance.value > 95999.999);
+      console.log("after withdraw reward balance ok");
     });
   },
   sanitizeResources: false,
@@ -221,35 +213,34 @@ Deno.test({
   name: "tx_history_check",
   async fn() {
     await wallet.sync().then(async () => {
-      await wallet.history(psks[0], (history) => {
-        console.log(history);
-        assertEquals(history[0].amount, -4000.001);
-        assertEquals(history[0].block_height, 15);
-        assertEquals(history[0].direction, "Out");
-        assertEquals(history[0].fee, 1000000);
-        assertEquals(
-          history[0].id,
-          "0x08f51398ac5abcfd1cb2ee32c9f67d77e3b22c942fa46e1fcc4c69193dd987f3"
-        );
+      const history = await wallet.history(psks[0]);
 
-        assertEquals(history[1].amount, 691.182775274);
-        assertEquals(history[1].block_height, 49);
-        assertEquals(history[1].direction, "Out");
-        assertEquals(history[1].fee, 29373240);
-        assertEquals(
-          history[1].id,
-          "0x09298dd7a65ec017dab932604c076d3226c3104437ce8cb91dc257f773e815d3"
-        );
+      assertEquals(history[0].amount, -4000.001);
+      assertEquals(history[0].block_height, 3);
+      assertEquals(history[0].direction, "Out");
+      assertEquals(history[0].fee, 1000000);
+      assertEquals(
+        history[0].id,
+        "0x08f51398ac5abcfd1cb2ee32c9f67d77e3b22c942fa46e1fcc4c69193dd987f3"
+      );
 
-        assertEquals(history[2].amount, -0.004130011);
-        assertEquals(history[2].block_height, 66);
-        assertEquals(history[2].direction, "Out");
-        assertEquals(history[2].fee, 4130011);
-        assertEquals(
-          history[2].id,
-          "0x0fd93d1cf7ceafbc3ad0410e98ed13cee250562ef8df33032a37ce52b9e056fb"
-        );
-      });
+      assertEquals(history[1].amount, 691.182775274);
+      assertEquals(history[1].block_height, 49);
+      assertEquals(history[1].direction, "Out");
+      assertEquals(history[1].fee, 29373240);
+      assertEquals(
+        history[1].id,
+        "0x09298dd7a65ec017dab932604c076d3226c3104437ce8cb91dc257f773e815d3"
+      );
+
+      assertEquals(history[2].amount, -0.004130011);
+      assertEquals(history[2].block_height, 66);
+      assertEquals(history[2].direction, "Out");
+      assertEquals(history[2].fee, 4130011);
+      assertEquals(
+        history[2].id,
+        "0x0fd93d1cf7ceafbc3ad0410e98ed13cee250562ef8df33032a37ce52b9e056fb"
+      );
     });
   },
   sanitizeResources: false,
