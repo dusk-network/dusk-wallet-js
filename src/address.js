@@ -15,8 +15,8 @@ export class Address extends String {
    * @returns
    */
   async claim(wallet) {
-    if (this.claimed) {
-      return true;
+    if (this.owned) {
+      return this;
     }
 
     // const addresses = await wallet.addresses;
@@ -28,9 +28,11 @@ export class Address extends String {
 
     // return this;
     this.#index = await wallet.findAddress(this);
+
+    return this;
   }
 
-  get claimed() {
+  get owned() {
     return this.#index > -1;
   }
 

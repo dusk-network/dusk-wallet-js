@@ -8681,16 +8681,17 @@ var Address = class extends String {
     }
     super(value);
   }
+  /**
+   *
+   * @param {Wallet} wallet
+   * @returns
+   */
   async claim(wallet) {
     if (this.owned) {
-      return true;
+      return this;
     }
-    const addresses = await wallet.addresses;
-    const availableAddresses = await wallet.availableAddresses;
-    this.#index = [...addresses, ...availableAddresses].findIndex(
-      (addr) => addr.toString() === this.toString()
-    );
-    return this.#index > -1;
+    this.#index = await wallet.findAddress(this);
+    return this;
   }
   get owned() {
     return this.#index > -1;
@@ -8723,33 +8724,36 @@ var Gas = class {
 };
 var Wallet = class {
   #addresses = void 0;
-  #availableAddresses = void 0;
+  #activeAddressesCount = 1;
   constructor(wasmExports, seed2) {
     this.wasm = wasmExports;
     this.seed = seed2;
   }
   get addresses() {
     if (!this.#addresses) {
+      console.log("populating addresses");
+      let resolve;
+      this.#addresses = new Promise((r) => resolve = r);
       const json = JSON.stringify({
         seed: Array.from(this.seed)
       });
       const keys2 = jsonFromBytes(
         call(this.wasm, json, this.wasm.public_spend_keys)
       ).keys.map((key) => new Address(key));
-      this.#availableAddresses = keys2.splice(1);
-      this.#addresses = keys2;
-      const promises = keys2.map((addr) => addr.claim(this));
-      console.log(this.#addresses);
-      console.log(this.#availableAddresses);
-      return Promise.all(promises).then(() => this.#addresses);
+      resolve(keys2);
     }
-    return Promise.resolve(this.#addresses);
-  }
-  get availableAddresses() {
-    return this.addresses.then(() => this.#availableAddresses);
+    return this.#addresses.then(
+      (addrs) => Promise.all(
+        addrs.slice(0, this.#activeAddressesCount).map((addr) => addr.claim(this))
+      )
+    );
   }
   get defaultAddress() {
-    return this.addresses.then(() => this.#addresses[0]);
+    return this.addresses.then((addrs) => addrs[0]);
+  }
+  async findAddress(address) {
+    const addrs = await this.#addresses;
+    return addrs.findIndex((addr) => addr.toString() === address.toString());
   }
   /**
    * Get balance

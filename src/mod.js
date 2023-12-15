@@ -66,37 +66,43 @@ export class Wallet {
   }
 
   get addresses() {
-    let loaded = Promise.resolve();
+    // let loaded = new Promise();
 
     if (!this.#addresses) {
+      console.log("populating addresses");
+
+      let resolve;
+
+      this.#addresses = new Promise((r) => (resolve = r));
+
       const json = JSON.stringify({
         seed: Array.from(this.seed),
       });
 
       const keys = jsonFromBytes(
         call(this.wasm, json, this.wasm.public_spend_keys)
-      ).keys.map((key) => new Address(key).claim(this));
+      ).keys.map((key) => new Address(key));
 
-      loaded = Promise.all(keys).then(
-        (addresses) => (this.#addresses = addresses)
-      );
+      resolve(keys);
     }
 
-    return loaded.then(() =>
-      this.#addresses.slice(0, this.#activeAddressesCount)
+    return this.#addresses.then((addrs) =>
+      Promise.all(
+        addrs
+          .slice(0, this.#activeAddressesCount)
+          .map((addr) => addr.claim(this))
+      )
     );
   }
 
   get defaultAddress() {
-    return this.addresses.then(() => this.#addresses[0]);
+    return this.addresses.then((addrs) => addrs[0]);
   }
 
   async findAddress(address) {
-    await this.addresses;
+    const addrs = await this.#addresses;
 
-    return this.#addresses.findIndex(
-      (addr) => addr.toString() === address.toString()
-    );
+    return addrs.findIndex((addr) => addr.toString() === address.toString());
   }
 
   /**
