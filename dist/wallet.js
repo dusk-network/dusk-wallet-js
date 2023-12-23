@@ -8701,24 +8701,14 @@ var Address = class extends String {
   }
 };
 
-// cache/deps/https/deno.land/8b96bb522d6c7659e9cf9c34376ea9921af3d532ef37408206f533b4b9d9c885.ts
-var { Deno } = globalThis;
-var noColor = typeof Deno?.noColor === "boolean" ? Deno.noColor : false;
-var ANSI_PATTERN = new RegExp(
-  [
-    "[\\u001B\\u009B][[\\]()#;?]*(?:(?:(?:(?:;[-a-zA-Z\\d\\/#&.:=?%@~_]+)*|[a-zA-Z\\d]+(?:;[-a-zA-Z\\d\\/#&.:=?%@~_]*)*)?\\u0007)",
-    "(?:(?:\\d{1,4}(?:;\\d{0,4})*)?[\\dA-PR-TXZcf-nq-uy=><~]))"
-  ].join("|"),
-  "g"
-);
-
 // src/mod.js
 var Gas = class {
   limit = NaN;
   price = NaN;
-  constructor({ limit = 29e8, price = 1 } = {}) {
-    this.limit = limit;
-    this.price = price;
+  // Passing null/undefined/0 will set the default value for price and limit
+  constructor({ limit, price } = {}) {
+    this.limit = Math.max(limit, 0) || 29e8;
+    this.price = Math.max(price, 0) || 1;
     Object.freeze(this);
   }
 };

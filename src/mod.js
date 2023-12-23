@@ -22,7 +22,6 @@ import { getNotesRkyvSerialized } from "./rkyv.js";
 
 import { execute } from "./execute.js";
 import { luxToDusk } from "./crypto.js";
-import { underline } from "../cache/deps/https/deno.land/8b96bb522d6c7659e9cf9c34376ea9921af3d532ef37408206f533b4b9d9c885.ts";
 
 // Export mnemnoic functions and other helper functions
 export { txStatus };
@@ -39,9 +38,10 @@ export class Gas {
   limit = NaN;
   price = NaN;
 
-  constructor({ limit = 2_900_000_000, price = 1 } = {}) {
-    this.limit = limit;
-    this.price = price;
+  // Passing null/undefined/0 or negative values will set the default value for price and limit
+  constructor({ limit, price } = {}) {
+    this.limit = Math.max(limit, 0) || 2_900_000_000;
+    this.price = Math.max(price, 0) || 1;
 
     Object.freeze(this);
   }
