@@ -232,7 +232,7 @@ export async function correctNotes(wasm) {
 
   // start the correction of the notes
   // get the nullifiers
-  const unspentNotesNullifiersSerialized = getNullifiersRkyvSerialized(
+  const unspentNotesNullifiersSerialized = await getNullifiersRkyvSerialized(
     wasm,
     unspentNotesNullifiers
   );
@@ -249,7 +249,7 @@ export async function correctNotes(wasm) {
   // calculate the unspent and spent notes
   // from all the unspent note in the db
   // their nullifiers
-  const correctedNotes = unspentSpentNotes(
+  const correctedNotes = await unspentSpentNotes(
     wasm,
     unspentNotesTemp,
     unspentNotesNullifiers,

@@ -13,12 +13,12 @@ import { call, jsonFromBytes } from "./wasm.js";
  * @param {Uint8Array} seed Seed of the walconst
  * @returns {Array<string>} psks base58 encoded public spend keys
  */
-export function getPsks(wasm, seed) {
+export async function getPsks(wasm, seed) {
   const json = JSON.stringify({
     seed: Array.from(seed),
   });
 
-  return jsonFromBytes(call(wasm, json, wasm.public_spend_keys)).keys;
+  return jsonFromBytes(await call(wasm, json, "public_spend_keys")).keys;
 }
 
 /**
@@ -28,7 +28,7 @@ export function getPsks(wasm, seed) {
  * @param {WebAssembly.Exports} wasm
  * @param {Uint8Array} seed Seed of the walconst
  * @param {number} index Index of the public spend key
- * @returns {Uint8Array} public_key rkyv serialized
+ * @returns {Promise} public_key rkyv serialized
  */
 export function getPublicKeyRkyvSerialized(wasm, seed, index) {
   const json = JSON.stringify({
@@ -36,5 +36,5 @@ export function getPublicKeyRkyvSerialized(wasm, seed, index) {
     index: index,
   });
 
-  return call(wasm, json, wasm.get_public_key_rkyv_serialized);
+  return call(wasm, json, "get_public_key_rkyv_serialized");
 }

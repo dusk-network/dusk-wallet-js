@@ -37,16 +37,12 @@ export async function stake(
   crypto.getRandomValues(rng_seed);
 
   // convert the amount from lux to dusk
-  amount = luxToDusk(wasm, amount);
+  amount = await luxToDusk(wasm, amount);
 
   const info = await stakeInfo(wasm, seed, senderIndex);
 
   if (info.has_staked) {
     throw new Error("Cannot stake if already staked");
-  }
-
-  if (!info.has_key) {
-    throw new Error("No stake exists for this key");
   }
 
   let counter = 0;
@@ -65,7 +61,7 @@ export async function stake(
     gas_price: gasPrice,
   });
 
-  const stctProofArgs = jsonFromBytes(call(wasm, args, wasm.get_stct_proof));
+  const stctProofArgs = jsonFromBytes(await call(wasm, args, "get_stct_proof"));
 
   const stctProofBytes = stctProofArgs.bytes;
   const crossover = stctProofArgs.crossover;
@@ -96,7 +92,7 @@ export async function stake(
   });
 
   const stakeCallData = jsonFromBytes(
-    call(wasm, callDataArgs, wasm.get_stake_call_data)
+    await call(wasm, callDataArgs, "get_stake_call_data")
   );
 
   const contract = stakeCallData.contract;
@@ -175,7 +171,7 @@ export async function unstake(
     gas_price: gasPrice,
   });
 
-  const wfctProofArgs = jsonFromBytes(call(wasm, args, wasm.get_wfct_proof));
+  const wfctProofArgs = jsonFromBytes(await call(wasm, args, "get_wfct_proof"));
   const wfctProofBytes = wfctProofArgs.bytes;
   const crossover = wfctProofArgs.crossover;
   const blinder = wfctProofArgs.blinder;
@@ -206,7 +202,7 @@ export async function unstake(
   });
 
   const unstakeCallData = jsonFromBytes(
-    call(wasm, callDataArgs, wasm.get_unstake_call_data)
+    await call(wasm, callDataArgs, "get_unstake_call_data")
   );
 
   const contract = unstakeCallData.contract;
@@ -243,84 +239,6 @@ export async function unstake(
  * Allow a staker psk to stake
  * @param {WebAssembly.Exports} wasm
  * @param {Uint8Array} seed
- * @param {number} staker_index Index of the staker
- * @param {number} sender_index Index of the sender, if undefined we use the default one
- * @param {number} gasLimit gas limit
- * @param {number} gasPrice gas price
- *
- * @returns {Promise} Promise object which resolves after the tx gets accepted into the blockchain
- */
-export async function stakeAllow(
-  wasm,
-  seed,
-  staker_index,
-  sender_index,
-  gasLimit,
-  gasPrice
-) {
-  const rng_seed = new Uint8Array(32);
-  crypto.getRandomValues(rng_seed);
-
-  const senderStakeinfo = await stakeInfo(wasm, seed, sender_index);
-  const stakerStakeInfo = await stakeInfo(wasm, seed, staker_index);
-
-  const refund = getPsks(wasm, seed)[sender_index];
-
-  let counter = 0;
-
-  if (stakerStakeInfo.has_key) {
-    throw new Error("staker_index is already allowed to stake");
-  }
-
-  if (senderStakeinfo.counter) {
-    counter = senderStakeinfo.counter;
-  }
-
-  const args = JSON.stringify({
-    rng_seed: Array.from(rng_seed),
-    seed: seed,
-    refund: refund,
-    sender_index: sender_index,
-    owner_index: staker_index,
-    counter: counter,
-    gas_limit: gasLimit,
-    gas_price: gasPrice,
-  });
-
-  const allowCallData = jsonFromBytes(
-    call(wasm, args, wasm.get_allow_call_data)
-  );
-
-  const callData = {
-    contract: allowCallData.contract,
-    method: allowCallData.method,
-    payload: allowCallData.payload,
-  };
-
-  const crossoverType = {
-    crossover: allowCallData.crossover,
-    blinder: allowCallData.blinder,
-    value: 0,
-  };
-
-  return execute(
-    wasm,
-    seed,
-    rng_seed,
-    refund,
-    undefined,
-    callData,
-    crossoverType,
-    allowCallData.fee,
-    gasLimit,
-    gasPrice
-  );
-}
-
-/**
- * Allow a staker psk to stake
- * @param {WebAssembly.Exports} wasm
- * @param {Uint8Array} seed
  * @param {number} staker_index the index of the staker who wants to withdraw the reward
  * @param {number} gasLimit gas limit
  * @param {number} gasPrice gas price
@@ -339,7 +257,7 @@ export async function withdrawReward(
 
   const info = await stakeInfo(wasm, seed, staker_index);
 
-  const refund = getPsks(wasm, seed)[staker_index];
+  const refund = (await getPsks(wasm, seed))[staker_index];
 
   // check if reward exists
   if (!info.has_staked || info.reward <= 0) {
@@ -365,7 +283,7 @@ export async function withdrawReward(
   });
 
   const withdrawCallData = jsonFromBytes(
-    call(wasm, args, wasm.get_withdraw_call_data)
+    await call(wasm, args, "get_withdraw_call_data")
   );
 
   const callData = {

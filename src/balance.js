@@ -23,6 +23,7 @@ export function BalanceInfo(value, maximum) {
 /**
  * Get balance from given unspent notes and seed
  * @param {WebAssembly.Exports} wasm
+ * @param {WebAssembly.Module} module web assembly module to send to worker
  * @param {Uint8Array} seed - Seed for the wallet
  * @param {string} psk - bs58 encoded string of psk of the address
  * @returns {BalanceInfo} The balance info
@@ -32,20 +33,22 @@ export function BalanceInfo(value, maximum) {
 export async function getBalance(wasm, seed, psk) {
   const notes = await getUnpsentNotes(psk);
 
+  // const args = new Uint8Array(seed.length + notes.length);
+
   const unspentNotes = notes.map((object) => object.note);
 
-  const serializedNotes = getNotesRkyvSerialized(wasm, unspentNotes);
+  const serializedNotes = await getNotesRkyvSerialized(wasm, unspentNotes);
 
   const balanceArgs = JSON.stringify({
     seed: Array.from(seed),
     notes: Array.from(serializedNotes),
   });
 
-  const obj = jsonFromBytes(call(wasm, balanceArgs, wasm.balance));
+  const obj = jsonFromBytes(await call(wasm, balanceArgs, "balance"));
 
   // convert the dusk values to lux
-  obj.value = duskToLux(wasm, obj.value);
-  obj.maximum = duskToLux(wasm, obj.maximum);
+  obj.value = await duskToLux(wasm, obj.value);
+  obj.maximum = await duskToLux(wasm, obj.maximum);
 
   return obj;
 }

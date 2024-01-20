@@ -19,6 +19,13 @@ import { path } from "../deps.js";
 const TRANSFER_CONTRACT = process.env.TRANSFER_CONTRACT;
 const NODE = process.env.CURRENT_NODE;
 
+Array.prototype.extend = function (other_array) {
+  /* You should include a test to check whether other_array really is an array */
+  other_array.forEach(function (v) {
+    this.push(v);
+  }, this);
+};
+
 /**
  *
  * @param {boolean} has_key If the user has the key in the allow list or not
@@ -67,39 +74,86 @@ export async function sync(wasm, seed, node = NODE) {
 
   // Get the leafs from the position above
   const resp = await request(
-    getU64RkyvSerialized(wasm, lastPosDB),
+    await getU64RkyvSerialized(wasm, lastPosDB),
     "leaves_from_pos",
     true,
     node
   );
 
-  // contains the chunks of the response, at the end of each iteration
-  // it conatains the remaining bytes
-  const buffer = [];
+  const notes = [];
+  const nullifiers = [];
+  const psks = [];
+  const blockHeights = [];
+
+  let lastPos = 0;
+  let buffer = [];
 
   for await (const chunk of resp.body) {
-    const len = chunk.length;
+    const chunkLen = chunk.length;
 
-    for (let i = 0; i < len; i++) {
+    for (let i = 0; i < chunkLen; i++) {
       buffer.push(chunk[i]);
+    }
+
+    let chunkSize = 632;
+
+    if (buffer.length >= 632) {
+      const numNotes = Math.floor(buffer.length / 632);
+      const notesPerFunction = 40;
+
+      if (numNotes > notesPerFunction) {
+        chunkSize = 632 * notesPerFunction;
+      } else {
+        chunkSize = 632 * numNotes;
+      }
+    } else {
+      break;
+    }
+
+    for (let i = 0; i < buffer.length; i += chunkSize) {
+      const slice = buffer.slice(i, i + chunkSize);
+
+      // this is the remainder
+      if (slice.length % 632 !== 0) {
+        buffer = slice;
+
+        break;
+      }
+
+      const owned = await getOwnedNotes(wasm, seed, slice);
+
+      buffer.splice(i, chunkSize);
+
+      i = 0;
+
+      const ownedNotes = owned.notes;
+      const ownedNullifiers = owned.nullifiers;
+      const ownedPsks = owned.public_spend_keys;
+      const ownedBlockHeights = owned.block_heights.split(",").map(Number);
+      lastPos = owned.last_pos;
+
+      notes.extend(ownedNotes);
+      nullifiers.extend(ownedNullifiers);
+      psks.extend(ownedPsks);
+      blockHeights.extend(ownedBlockHeights);
+
+      if (i + chunkSize > buffer.length) {
+        break;
+      }
     }
   }
 
-  const owned = getOwnedNotes(wasm, seed, buffer);
-  const notes = owned.notes;
-  const nullifiers = owned.nullifiers;
-  const psks = owned.public_spend_keys;
-  const blockHeights = owned.block_heights.split(",").map(Number);
-  const lastPos = owned.last_pos;
-
-  const nullifiersSerialized = getNullifiersRkyvSerialized(wasm, nullifiers);
+  const nullifiersSerialized = await getNullifiersRkyvSerialized(
+    wasm,
+    nullifiers
+  );
 
   // Fetch existing nullifiers from the node
   const existingNullifiersBytes = await responseBytes(
     await request(nullifiersSerialized, "existing_nullifiers", false)
   );
 
-  const allNotes = unspentSpentNotes(
+  const allNotes = await unspentSpentNotes(
     wasm,
     notes,
     nullifiers,
@@ -180,7 +234,7 @@ export async function fetchOpenings(pos, node = NODE) {
  * @returns {StakeInfo} Info about the stake
  */
 export async function stakeInfo(wasm, seed, index) {
-  const pk = getPublicKeyRkyvSerialized(wasm, seed, index);
+  const pk = await getPublicKeyRkyvSerialized(wasm, seed, index);
 
   console.log("Fetching stake info");
 
@@ -199,7 +253,7 @@ export async function stakeInfo(wasm, seed, index) {
     stake_info: Array.from(stakeInfoRequest),
   });
 
-  const info = jsonFromBytes(call(wasm, args, wasm.get_stake_info));
+  const info = jsonFromBytes(await call(wasm, args, "get_stake_info"));
 
   return new StakeInfo(
     info.has_key,
