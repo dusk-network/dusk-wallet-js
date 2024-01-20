@@ -49,15 +49,13 @@ export async function history(wasm, seed, psk) {
 
   const noteBlockHeights = arrayMax(notes.map((note) => note.block_height));
 
-  console.log(notes.map((note) => note.block_height));
-
   if (lastInsertedBlockHeight >= noteBlockHeights) {
     return histData;
   }
 
   const txData = [];
   const noteData = [];
-  const index = getPsks(wasm, seed).indexOf(psk);
+  const index = (await getPsks(wasm, seed)).indexOf(psk);
 
   for (const note of notes) {
     const blockHeight = note.block_height;
@@ -84,12 +82,14 @@ export async function history(wasm, seed, psk) {
     tx_data: txData,
   });
 
-  const result = jsonFromBytes(call(wasm, args, wasm.get_history));
-  const history = result.history.map((tx) => {
-    tx.fee = duskToLux(wasm, parseInt(tx.fee));
+  const result = jsonFromBytes(await call(wasm, args, "get_history"));
+  const history = await Promise.all(
+    result.history.map(async (tx) => {
+      tx.fee = await duskToLux(wasm, parseInt(tx.fee));
 
-    return tx;
-  });
+      return tx;
+    })
+  );
 
   const lastBlockHeight = arrayMax(histData.map((tx) => tx.block_height));
 

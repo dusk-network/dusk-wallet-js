@@ -12,12 +12,12 @@ import { call, jsonFromBytes } from "./wasm.js";
  * @param {Uint8Array} unprovenTx - UnprovenTx bytes recieived from calling execute in wasm
  * @returns {Uint8Array} var bytes of unproven tx ready to be sent to the network
  */
-export function getUnprovenTxVarBytes(wasm, unprovenTx) {
+export async function getUnprovenTxVarBytes(wasm, unprovenTx) {
   const args = JSON.stringify({
     bytes: Array.from(unprovenTx),
   });
 
-  const result = jsonFromBytes(call(wasm, args, wasm.unproven_tx_to_bytes));
+  const result = jsonFromBytes(await call(wasm, args, "unproven_tx_to_bytes"));
 
   return result.serialized;
 }
@@ -28,13 +28,13 @@ export function getUnprovenTxVarBytes(wasm, unprovenTx) {
  * @param {Uint8Array} proof proof recieved from the network
  * @returns {Uint8Array} the proven transaction bytes ready to be sent to the network
  */
-export function proveTx(wasm, unprovenTx, proof) {
+export async function proveTx(wasm, unprovenTx, proof) {
   const args = JSON.stringify({
     unproven_tx: Array.from(unprovenTx),
     proof: Array.from(proof),
   });
 
-  const result = jsonFromBytes(call(wasm, args, wasm.prove_tx));
+  const result = jsonFromBytes(await call(wasm, args, "prove_tx"));
 
   return result;
 }

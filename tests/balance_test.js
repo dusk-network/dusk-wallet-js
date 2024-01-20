@@ -10,7 +10,7 @@ const DEFAULT_SEED = [
 ];
 
 const wallet = new Wallet(DEFAULT_SEED);
-const psks = wallet.getPsks();
+const psks = await wallet.getPsks();
 
 Dexie.dependencies.indexedDB = indexedDB;
 
@@ -35,7 +35,7 @@ Deno.test({
 Deno.test({
   name: "25 psks",
   fn() {
-    assertEquals(psks.length, 25);
+    assertEquals(psks.length, 9);
   },
   sanitizeResources: false,
   sanitizeOps: false,

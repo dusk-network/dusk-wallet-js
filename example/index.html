@@ -4,6 +4,24 @@
 
   <body>
     <div><p>Well this is awkward</p></div>
+    <style>
+      .spinner-border {
+        display: inline-block;
+        width: 2rem;
+        height: 2rem;
+        vertical-align: -0.125em;
+        border: 0.25em solid currentcolor;
+        border-right-color: #0000;
+        border-radius: 50%;
+        animation: 0.75s linear infinite spinner-border;
+      }
+
+      @keyframes spinner-border {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+    </style>
     <script type="module">
       ReadableStream.prototype[Symbol.asyncIterator] = async function* () {
         const reader = this.getReader();
@@ -17,7 +35,7 @@
           reader.releaseLock();
         }
       };
-      import { Wallet, generateRandomMnemonic } from "../dist/wallet.js";
+      import { Wallet } from "../dist/wallet.js";
       // Default wallet seed
       const seed = [
         62, 107, 200, 150, 136, 164, 160, 96, 51, 120, 7, 147, 214, 247, 92,
@@ -49,7 +67,7 @@
         //   memory = exports.memory;
 
         let wallet = new Wallet(seed);
-        let psks = wallet.getPsks();
+        let psks = await wallet.getPsks();
         console.log(psks);
 
         // console.log(getTreeLeafDeserialized(exports, leaf));
@@ -73,5 +91,7 @@
 
       initWasm().catch((e) => console.error(e));
     </script>
+
+    <div class="spinner-border"></div>
   </body>
 </html>

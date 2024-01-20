@@ -4,13 +4,15 @@
 //
 // Copyright (c) DUSK NETWORK. All rights reserved.
 
+import { WasmWorker } from "./worker.js";
+
 /**
  * Allocate memory
  * @param {WebAssembly.Exports} wasm
  * @param {Uint8Array} bytes
  * @returns {number} returns the pointer to the allocated buffer
  */
-function alloc(wasm, bytes) {
+export function alloc(wasm, bytes) {
   const length = bytes.byteLength;
 
   try {
@@ -29,7 +31,7 @@ function alloc(wasm, bytes) {
  * @param result decomposed result of a wasm call
  * @returns {Uint8Array} memory the function allocated
  */
-function getAndFree(wasm, result) {
+export function getAndFree(wasm, result) {
   try {
     const mem = new Uint8Array(wasm.memory.buffer, result.ptr, result.length);
 
@@ -44,7 +46,7 @@ function getAndFree(wasm, result) {
  * @param {BigInt} result result of a wasm call
  * @returns {object} an object containing ptr, length and status bit
  */
-function decompose(result) {
+export function decompose(result) {
   const ptr = result >> 32n;
   const len = ((result << 32n) & ((1n << 64n) - 1n)) >> 40n;
   const success = ((result << 63n) & ((1n << 64n) - 1n)) >> 63n == 0n;
@@ -83,28 +85,18 @@ export function jsonFromBytes(bytes) {
 }
 /**
  * Perform a wasm function call
- * @param {WebAssembly.Exports} wasm
+ * @param {WebAssembly.Instance} wasm
  * @param {object} args Arguments of the function in JSON
- * @param {WebAssembly.ExportValue} function_call name of the function you want to call
- * @returns {Uint8Array} bytes return value of the call
+ * @param {string} function_call name of the function you want to call
+ * @returns {Promise<Uint8Array>} bytes return value of the call
  */
 export function call(wasm, args, function_call) {
+  const exports = WebAssembly.Module.exports(wasm);
+  const worker = new WasmWorker(wasm);
+  const index = exports.findIndex((e) => e.name === function_call);
   const argBytes = toBytes(args);
 
-  // allocate the json we want to send to walconst-core
-  const ptr = alloc(wasm, argBytes);
-  const call = function_call(ptr, argBytes.byteLength);
-  const callResult = decompose(call);
-
-  if (!callResult.status) {
-    console.error(
-      "Function call " + function_call.name.toString() + " failed!"
-    );
-  }
-
-  const bytes = getAndFree(wasm, callResult);
-
-  return bytes;
+  return worker.call(index, argBytes);
 }
 
 /**
@@ -112,21 +104,12 @@ export function call(wasm, args, function_call) {
  * @param {WebAssembly.Exports} wasm
  * @param {Uint8Array} args Arguments of the function in bytes
  * @param {WebAssembly.ExportValue} function_call name of the function you want to call
- * @returns {Uint8Array} bytes return value of the call
+ * @returns {Promise<Uint8Array>} bytes return value of the call
  */
 export function call_raw(wasm, args, function_call) {
-  // allocate the json we want to send to walconst-core
-  const ptr = alloc(wasm, args);
-  const call = function_call(ptr, args.length);
-  const callResult = decompose(call);
+  const exports = WebAssembly.Module.exports(wasm);
+  const worker = new WasmWorker(wasm);
+  const index = exports.findIndex((e) => e.name === function_call);
 
-  if (!callResult.status) {
-    console.error(
-      "Function call " + function_call.name.toString() + " failed!"
-    );
-  }
-
-  const bytes = getAndFree(wasm, callResult);
-
-  return bytes;
+  return worker.call(index, args);
 }

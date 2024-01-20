@@ -19,7 +19,7 @@ export function getNullifiers(wasm, seed, notes) {
     notes: Array.from(notes),
   });
 
-  return call(wasm, json, wasm.nullifiers);
+  return call(wasm, json, "nullifiers");
 }
 
 /**
@@ -30,13 +30,13 @@ export function getNullifiers(wasm, seed, notes) {
  * @param {Uint8Array} leaves - leafs we get from the node
  * @returns {object} - object.last_pos, object.owned_notes
  */
-export function getOwnedNotes(wasm, seed, leaves) {
+export async function getOwnedNotes(wasm, seed, leaves) {
   const args = new Uint8Array(seed.length + leaves.length);
 
   args.set(seed);
   args.set(leaves, seed.length);
 
-  return jsonFromBytes(call_raw(wasm, args, wasm.check_note_ownership));
+  return jsonFromBytes(await call_raw(wasm, args, "check_note_ownership"));
 }
 
 /**
@@ -50,7 +50,7 @@ export function getOwnedNotes(wasm, seed, leaves) {
  * @param {Array<string>} psks Public spend keys of the notes
  * @returns {object} json of the response
  */
-export function unspentSpentNotes(
+export async function unspentSpentNotes(
   wasm,
   notes,
   nullifiersOfNote,
@@ -66,7 +66,7 @@ export function unspentSpentNotes(
     psks: psks,
   });
 
-  return jsonFromBytes(call(wasm, args, wasm.unspent_spent_notes));
+  return jsonFromBytes(await call(wasm, args, "unspent_spent_notes"));
 }
 
 /**
@@ -75,12 +75,12 @@ export function unspentSpentNotes(
  * @param {number} dusk Dusk amount to convert to lux
  * @returns {number} lux amount
  */
-export function duskToLux(wasm, dusk) {
+export async function duskToLux(wasm, dusk) {
   const args = JSON.stringify({
     dusk: dusk,
   });
 
-  return jsonFromBytes(call(wasm, args, wasm.dusk_to_lux)).lux;
+  return jsonFromBytes(await call(wasm, args, "dusk_to_lux")).lux;
 }
 
 /**
@@ -89,10 +89,10 @@ export function duskToLux(wasm, dusk) {
  * @param {number} lux Lux amount to convert to dusk
  * @returns {number} dusk amount
  */
-export function luxToDusk(wasm, lux) {
+export async function luxToDusk(wasm, lux) {
   const args = JSON.stringify({
     lux: lux,
   });
 
-  return jsonFromBytes(call(wasm, args, wasm.lux_to_dusk)).dusk;
+  return jsonFromBytes(await call(wasm, args, "lux_to_dusk")).dusk;
 }

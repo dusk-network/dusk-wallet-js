@@ -46,7 +46,7 @@ export async function execute(
   gas_limit,
   gas_price
 ) {
-  const sender_index = getPsks(wasm, seed).indexOf(psk);
+  const sender_index = (await getPsks(wasm, seed)).indexOf(psk);
 
   const notes = await getUnpsentNotes(psk);
 
@@ -57,7 +57,9 @@ export async function execute(
 
   for (const noteData of notes) {
     const pos = noteData.pos;
-    const fetchedOpening = await fetchOpenings(getU64RkyvSerialized(wasm, pos));
+    const fetchedOpening = await fetchOpenings(
+      await getU64RkyvSerialized(wasm, pos)
+    );
 
     const opening = Array.from(fetchedOpening);
 
@@ -73,9 +75,11 @@ export async function execute(
     nullifiers.push(noteData.nullifier);
   }
 
-  const openingsSerialized = Array.from(getOpeningsSerialized(wasm, openings));
+  const openingsSerialized = Array.from(
+    await getOpeningsSerialized(wasm, openings)
+  );
 
-  const inputs = Array.from(getNotesRkyvSerialized(wasm, allNotes));
+  const inputs = Array.from(await getNotesRkyvSerialized(wasm, allNotes));
 
   const args = JSON.stringify({
     call: callData,
@@ -92,11 +96,11 @@ export async function execute(
     gas_price: gas_price,
   });
 
-  const unprovenTx = jsonFromBytes(call(wasm, args, wasm.execute)).tx;
+  const unprovenTx = jsonFromBytes(await call(wasm, args, "execute")).tx;
 
   console.log("unrpovenTx length: " + unprovenTx.length);
 
-  const varBytes = getUnprovenTxVarBytes(wasm, unprovenTx);
+  const varBytes = await getUnprovenTxVarBytes(wasm, unprovenTx);
   const proofReq = await request(
     varBytes,
     "prove_execute",
@@ -115,7 +119,7 @@ export async function execute(
   const buffer = await proofReq.arrayBuffer();
   const bytes = new Uint8Array(buffer);
   // prove and propogate tx
-  const tx = proveTx(wasm, unprovenTx, bytes);
+  const tx = await proveTx(wasm, unprovenTx, bytes);
   const txBytes = tx.bytes;
   const txHash = tx.hash;
 
