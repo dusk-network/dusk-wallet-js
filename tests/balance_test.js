@@ -176,35 +176,6 @@ Deno.test({
 });
 
 Deno.test({
-  name: "stake_allow",
-  async fn() {
-    await wallet.sync().then(async () => {
-      const info = await wallet.stakeInfo(psks[2]);
-
-      // make sure the 2nd psk isn't allowed for staking
-      if (info.has_key === false) {
-        // allow staking for 2nd psk
-        await wallet.stakeAllow(psks[2]);
-      }
-    });
-  },
-  sanitizeResources: false,
-  sanitizeOps: false,
-});
-
-Deno.test({
-  name: "stake_allow_check",
-  async fn() {
-    const info = await wallet.stakeInfo(psks[2]);
-    // check if staking is allowed
-    assert(info.has_key === true);
-    console.log("stake allow check ok");
-  },
-  sanitizeResources: false,
-  sanitizeOps: false,
-});
-
-Deno.test({
   name: "tx_history_check",
   async fn() {
     await wallet.sync().then(async () => {
@@ -228,17 +199,7 @@ Deno.test({
       assertEquals(history[1].direction, "Out");
       assertEquals(parseFloat(history[1].fee, 10), history[1].fee);
       assertEquals(history[1].id.length, 64);
-      assert(history[1].tx_type == "WITHDRAW" || history[1].tx_type == "ALLOW");
-
-      assertEquals(parseFloat(history[2].amount), history[2].amount);
-      assertEquals(
-        parseInt(history[2].block_height, 10),
-        history[2].block_height
-      );
-      assertEquals(history[2].direction, "Out");
-      assertEquals(parseFloat(history[2].fee, 10), history[2].fee);
-      assertEquals(history[2].id.length, 64);
-      assert(history[2].tx_type == "WITHDRAW" || history[2].tx_type == "ALLOW");
+      assert(history[1].tx_type == "WITHDRAW");
     });
   },
   sanitizeResources: false,

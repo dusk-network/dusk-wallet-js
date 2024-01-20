@@ -10,12 +10,7 @@ import { getBalance } from "./balance.js";
 import { transfer } from "./contracts/transfer.js";
 import { txStatus } from "./graphql.js";
 import { sync, stakeInfo } from "./node.js";
-import {
-  stake,
-  unstake,
-  stakeAllow,
-  withdrawReward,
-} from "./contracts/stake.js";
+import { stake, unstake, withdrawReward } from "./contracts/stake.js";
 import { history } from "./history.js";
 import { clearDB } from "./db.js";
 
@@ -169,42 +164,6 @@ Wallet.prototype.unstake = async function (unstaker) {
     this.gasLimit,
     this.gasPrice
   );
-};
-
-/**
- * Allow staking dusk from the provided psk
- * @param {string} allowStakePsk psk to allow staking from
- * @param {string} [senderPsk] senderPsk the psk of the sender, if undefined then index 0 (default index) is used
- * @returns {Promise} promise resolves when stake allow request is obtained
- */
-Wallet.prototype.stakeAllow = async function (allowStakePsk, senderPsk) {
-  const psks = await this.getPsks();
-  const staker = psks.indexOf(allowStakePsk);
-  const sender = psks.indexOf(senderPsk);
-
-  if (staker === -1) {
-    throw new Error("staker psk not found");
-  }
-
-  if (sender === -1) {
-    return stakeAllow(
-      this.wasm,
-      this.seed,
-      staker,
-      0,
-      this.gasLimit,
-      this.gasPrice
-    );
-  } else {
-    return stakeAllow(
-      this.wasm,
-      this.seed,
-      staker,
-      sender,
-      this.gasLimit,
-      this.gasPrice
-    );
-  }
 };
 
 /**

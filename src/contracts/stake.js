@@ -45,10 +45,6 @@ export async function stake(
     throw new Error("Cannot stake if already staked");
   }
 
-  if (!info.has_key) {
-    throw new Error("No stake exists for this key");
-  }
-
   let counter = 0;
 
   if (info.counter) {
@@ -234,84 +230,6 @@ export async function unstake(
     callData,
     crossoverType,
     fee,
-    gasLimit,
-    gasPrice
-  );
-}
-
-/**
- * Allow a staker psk to stake
- * @param {WebAssembly.Exports} wasm
- * @param {Uint8Array} seed
- * @param {number} staker_index Index of the staker
- * @param {number} sender_index Index of the sender, if undefined we use the default one
- * @param {number} gasLimit gas limit
- * @param {number} gasPrice gas price
- *
- * @returns {Promise} Promise object which resolves after the tx gets accepted into the blockchain
- */
-export async function stakeAllow(
-  wasm,
-  seed,
-  staker_index,
-  sender_index,
-  gasLimit,
-  gasPrice
-) {
-  const rng_seed = new Uint8Array(32);
-  crypto.getRandomValues(rng_seed);
-
-  const senderStakeinfo = await stakeInfo(wasm, seed, sender_index);
-  const stakerStakeInfo = await stakeInfo(wasm, seed, staker_index);
-
-  const refund = (await getPsks(wasm, seed))[sender_index];
-
-  let counter = 0;
-
-  if (stakerStakeInfo.has_key) {
-    throw new Error("staker_index is already allowed to stake");
-  }
-
-  if (senderStakeinfo.counter) {
-    counter = senderStakeinfo.counter;
-  }
-
-  const args = JSON.stringify({
-    rng_seed: Array.from(rng_seed),
-    seed: seed,
-    refund: refund,
-    sender_index: sender_index,
-    owner_index: staker_index,
-    counter: counter,
-    gas_limit: gasLimit,
-    gas_price: gasPrice,
-  });
-
-  const allowCallData = jsonFromBytes(
-    await call(wasm, args, "get_allow_call_data")
-  );
-
-  const callData = {
-    contract: allowCallData.contract,
-    method: allowCallData.method,
-    payload: allowCallData.payload,
-  };
-
-  const crossoverType = {
-    crossover: allowCallData.crossover,
-    blinder: allowCallData.blinder,
-    value: 0,
-  };
-
-  return execute(
-    wasm,
-    seed,
-    rng_seed,
-    refund,
-    undefined,
-    callData,
-    crossoverType,
-    allowCallData.fee,
     gasLimit,
     gasPrice
   );
