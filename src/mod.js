@@ -30,7 +30,7 @@ export { txStatus };
  * @property {number} [gasPrice] The gas price of the wallet, default is 1
  */
 export function Wallet(seed, gasLimit = 2900000000, gasPrice = 1) {
-  const module = new WebAssembly.Module(initSync());
+  const module = WebAssembly.compile(initSync());
 
   this.wasm = module;
   this.seed = seed;

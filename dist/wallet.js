@@ -165,16 +165,18 @@ function jsonFromBytes(bytes) {
     throw new Error("Error while parsing json output from function:", e);
   }
 }
-function call(wasm2, args, function_call) {
-  const exports = WebAssembly.Module.exports(wasm2);
-  const worker = new WasmWorker(wasm2);
+async function call(wasm2, args, function_call) {
+  let module = await wasm2;
+  const exports = WebAssembly.Module.exports(module);
+  const worker = new WasmWorker(module);
   const index = exports.findIndex((e) => e.name === function_call);
   const argBytes = toBytes(args);
   return worker.call(index, argBytes);
 }
-function call_raw(wasm2, args, function_call) {
-  const exports = WebAssembly.Module.exports(wasm2);
-  const worker = new WasmWorker(wasm2);
+async function call_raw(wasm2, args, function_call) {
+  let module = await wasm2;
+  const exports = WebAssembly.Module.exports(module);
+  const worker = new WasmWorker(module);
   const index = exports.findIndex((e) => e.name === function_call);
   return worker.call(index, args);
 }
@@ -10486,7 +10488,7 @@ function arrayMax(arr) {
 
 // src/mod.js
 function Wallet(seed, gasLimit = 29e8, gasPrice = 1) {
-  const module = new WebAssembly.Module(initSync());
+  const module = WebAssembly.compile(initSync());
   this.wasm = module;
   this.seed = seed;
   this.gasLimit = gasLimit;
