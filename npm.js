@@ -70,9 +70,9 @@ if (Deno.args.length > 0) {
 
 const isDirty = new TextDecoder().decode(codeDirty.stdout);
 
-// if (isDirty !== "") {
-//   throw new Error("Git repo is dirty, commit changes before building");
-// }
+if (isDirty !== "") {
+  throw new Error("Git repo is dirty, commit changes before building");
+}
 
 await build({
   entryPoints: ["./src/mod.js"],
