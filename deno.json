@@ -1,6 +1,7 @@
 {
     "tasks": {
         "build": "deno run --allow-read --allow-net --allow-write --allow-env --allow-run build.js",
+        "npm": "deno task build && deno run -A npm.js",
         "server": "deno run --allow-read --allow-net example/testServer.js",
         "buildServe": "deno task build && deno task server",
         "test": "rm -rf D_state.sqlite && rm -rf __sysdb__.sqlite && deno task build && deno test --allow-read --allow-net --allow-write  --trace-ops",

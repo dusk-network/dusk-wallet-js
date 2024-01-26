@@ -10,6 +10,6 @@ import {
   assert,
 } from "https://deno.land/std@0.207.0/assert/mod.ts";
 import * as path from "https://deno.land/std@0.102.0/path/mod.ts";
-import { initSync } from "./pkg/dusk_wallet_core.js";
+import { initSync } from "./dist/dusk_wallet_core.js";
 
 export { Dexie, indexedDB, assertEquals, assert, path, initSync };

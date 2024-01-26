@@ -49,8 +49,6 @@ export async function history(wasm, seed, psk) {
 
   const noteBlockHeights = arrayMax(notes.map((note) => note.block_height));
 
-  console.log(notes.map((note) => note.block_height));
-
   if (lastInsertedBlockHeight >= noteBlockHeights) {
     return histData;
   }
