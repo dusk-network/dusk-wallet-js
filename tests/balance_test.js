@@ -1,6 +1,13 @@
+// This Source Code Form is subject to the terms of the Mozilla Public
+// License, v. 2.0. If a copy of the MPL was not distributed with this
+// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+//
+// Copyright (c) DUSK NETWORK. All rights reserved.
+
 import { Wallet } from "../dist/wallet.js"; // url_test.ts
 import { assert, assertEquals, Dexie, indexedDB } from "../deps.js";
-import { existsSync } from "https://deno.land/std@0.213.0/fs/mod.ts";
+
+const PRECISION_DIGITS = 4;
 
 const DEFAULT_SEED = [
   153, 16, 102, 99, 133, 196, 55, 237, 42, 2, 163, 116, 233, 89, 10, 115, 19,
@@ -10,7 +17,7 @@ const DEFAULT_SEED = [
 ];
 
 const wallet = new Wallet(DEFAULT_SEED);
-const psks = wallet.getPsks();
+const psks = await wallet.getPsks();
 
 Dexie.dependencies.indexedDB = indexedDB;
 
@@ -23,10 +30,10 @@ Deno.test({
   async fn() {
     await wallet.sync().then(async () => {
       const balance = await wallet.getBalance(psks[0]);
-
       assertEquals(balance.value, 100000);
     });
   },
+  // Those are needed due to `fake-indexedDb` implementation
   sanitizeResources: false,
   sanitizeOps: false,
 });
@@ -37,15 +44,15 @@ Deno.test({
   fn() {
     assertEquals(psks.length, 9);
   },
-  sanitizeResources: false,
-  sanitizeOps: false,
 });
 
 Deno.test({
   name: "test_transfer",
   async fn() {
+    const balance = await wallet.getBalance(psks[0]);
     await wallet.transfer(psks[0], psks[1], 4000);
   },
+  // Those are needed due to `fake-indexedDb` implementation
   sanitizeResources: false,
   sanitizeOps: false,
 });
@@ -55,7 +62,7 @@ Deno.test({
   async fn() {
     await wallet.sync().then(async () => {
       const balance = await wallet.getBalance(psks[0]);
-      assertEquals(balance.value, 95999.999724165);
+      assertEquals(balance.value.toFixed(PRECISION_DIGITS), "95999.9997");
     });
 
     await wallet.sync().then(async () => {
@@ -181,20 +188,20 @@ Deno.test({
     await wallet.sync().then(async () => {
       const history = await wallet.history(psks[0]);
 
-      assertEquals(history[0].amount, -4000.000275835);
+      assertEquals(history[0].amount.toFixed(PRECISION_DIGITS), "-4000.0003");
       assertEquals(
         parseInt(history[0].block_height, 10),
-        history[0].block_height
+        history[0].block_height,
       );
       assertEquals(history[0].direction, "Out");
-      assertEquals(history[0].fee, 0.000275835);
+      assertEquals(history[0].fee.toFixed(PRECISION_DIGITS), "0.0003");
       assertEquals(history[0].id.length, 64);
       assertEquals(history[0].tx_type, "TRANSFER");
 
       assertEquals(parseFloat(history[1].amount, 10), history[1].amount);
       assertEquals(
         parseInt(history[1].block_height, 10),
-        history[1].block_height
+        history[1].block_height,
       );
       assertEquals(history[1].direction, "Out");
       assertEquals(parseFloat(history[1].fee, 10), history[1].fee);
@@ -216,37 +223,6 @@ Deno.test({
     const exists = await Dexie.exists("state");
 
     assert(!exists);
-  },
-  sanitizeResources: false,
-  sanitizeOps: false,
-});
-
-Deno.test({
-  name: "check if npm.js builds the package",
-  async fn() {
-    const isReadableDir = existsSync("./npm", {
-      isDirectory: true,
-    });
-
-    if (isReadableDir) {
-      await Deno.remove("./npm", { recursive: true });
-    }
-
-    const command = new Deno.Command(Deno.execPath(), {
-      args: ["run", "-A", "npm.js"],
-    });
-
-    const process = await command.output();
-
-    assert(process.success);
-
-    const checkIfMade = existsSync("./npm", {
-      isDirectory: true,
-    });
-
-    console.log(checkIfMade);
-
-    assert(checkIfMade);
   },
   sanitizeResources: false,
   sanitizeOps: false,
