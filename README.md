@@ -11,7 +11,7 @@ This will be later grafted into js-utils repo
 ```
 This will create a `dist/wallet.js` which can be used on the frontend side
 
-## Usage 
+## Usage
 
 [`example/index.html`](https://github.com/dusk-network/dusk-wallet-js/tree/main/example)
 
@@ -25,8 +25,6 @@ This will create a `dist/wallet.js` which can be used on the frontend side
     );
 
     let wasm = instance.exports;
-    // generate random mnemonic for users
-    let mnemonic = generateRandomMnemonic(wasm);
     // Default wallet seed
     let seed = [
       153, 16, 102, 99, 133, 196, 55, 237, 42, 2, 163, 116, 233, 89, 10, 115,

@@ -4,7 +4,8 @@
 //
 // Copyright (c) DUSK NETWORK. All rights reserved.
 
-import { call, jsonFromBytes } from "./wasm.js";
+import { call } from "./wasm.js";
+import { parseEncodedJSON } from "./encoding.js";
 
 /**
  * Get the public spend keys in order from 1 to 24 for the seed
@@ -13,12 +14,12 @@ import { call, jsonFromBytes } from "./wasm.js";
  * @param {Uint8Array} seed Seed of the walconst
  * @returns {Array<string>} psks base58 encoded public spend keys
  */
-export function getPsks(wasm, seed) {
+export async function getPsks(wasm, seed) {
   const json = JSON.stringify({
     seed: Array.from(seed),
   });
 
-  return jsonFromBytes(call(wasm, json, wasm.public_spend_keys)).keys;
+  return parseEncodedJSON(await call(wasm, json, "public_spend_keys")).keys;
 }
 
 /**
@@ -30,11 +31,11 @@ export function getPsks(wasm, seed) {
  * @param {number} index Index of the public spend key
  * @returns {Uint8Array} public_key rkyv serialized
  */
-export function getPublicKeyRkyvSerialized(wasm, seed, index) {
+export function getPublicKeyRkyvSerialized(wasm, [...seed], index) {
   const json = JSON.stringify({
-    seed: Array.from(seed),
-    index: index,
+    seed,
+    index,
   });
 
-  return call(wasm, json, wasm.get_public_key_rkyv_serialized);
+  return call(wasm, json, "get_public_key_rkyv_serialized");
 }

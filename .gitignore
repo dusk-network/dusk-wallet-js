@@ -1,12 +1,9 @@
-cache
+/cache
+/out
+/npm
+/dist
+/pkg
+/assets
 
-npm
-out
-
-dist/
-pkg/
-assets/
-
-.DS_Store
-
-pkg/.DS_Store
+**/.DS_Store
+**/*.lock

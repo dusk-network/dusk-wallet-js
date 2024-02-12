@@ -4,8 +4,8 @@
 //
 // Copyright (c) DUSK NETWORK. All rights reserved.
 
-import { call, jsonFromBytes, call_raw } from "./wasm.js";
-
+import { call, call_raw } from "./wasm.js";
+import { parseEncodedJSON } from "./encoding.js";
 /**
  * Get nullifiers for the notes
  * @param {WebAssembly.Exports} wasm
@@ -13,13 +13,13 @@ import { call, jsonFromBytes, call_raw } from "./wasm.js";
  * @param {Uint8Array} notes - Notes we want the nullifiers of
  * @returns {Uint8Array} nullifiers - rkyv serialised nullifiers in a Vector
  */
-export function getNullifiers(wasm, seed, notes) {
+export function getNullifiers(wasm, [...seed], [...notes]) {
   const json = JSON.stringify({
-    seed: Array.from(seed),
-    notes: Array.from(notes),
+    seed,
+    notes,
   });
 
-  return call(wasm, json, wasm.nullifiers);
+  return call(wasm, json, "nullifiers");
 }
 
 /**
@@ -32,11 +32,9 @@ export function getNullifiers(wasm, seed, notes) {
  */
 export function getOwnedNotes(wasm, seed, leaves) {
   const args = new Uint8Array(seed.length + leaves.length);
-
   args.set(seed);
   args.set(leaves, seed.length);
-
-  return jsonFromBytes(call_raw(wasm, args, wasm.check_note_ownership));
+  return call_raw(wasm, args, "check_note_ownership").then(parseEncodedJSON);
 }
 
 /**
@@ -56,7 +54,7 @@ export function unspentSpentNotes(
   nullifiersOfNote,
   blockHeights,
   existingNullifiers,
-  psks
+  psks,
 ) {
   const args = JSON.stringify({
     notes: notes,
@@ -65,22 +63,21 @@ export function unspentSpentNotes(
     existing_nullifiers: Array.from(existingNullifiers),
     psks: psks,
   });
-
-  return jsonFromBytes(call(wasm, args, wasm.unspent_spent_notes));
+  return call(wasm, args, "unspent_spent_notes").then(parseEncodedJSON);
 }
 
 /**
  * Convert lux to dusk
  * @param {WebAssembly.Exports} wasm
  * @param {number} dusk Dusk amount to convert to lux
- * @returns {number} lux amount
+ * @returns {Promise<number>} lux amount
  */
-export function duskToLux(wasm, dusk) {
+export async function duskToLux(wasm, dusk) {
   const args = JSON.stringify({
     dusk: dusk,
   });
 
-  return jsonFromBytes(call(wasm, args, wasm.dusk_to_lux)).lux;
+  return parseEncodedJSON(await call(wasm, args, "dusk_to_lux")).lux;
 }
 
 /**
@@ -89,10 +86,10 @@ export function duskToLux(wasm, dusk) {
  * @param {number} lux Lux amount to convert to dusk
  * @returns {number} dusk amount
  */
-export function luxToDusk(wasm, lux) {
+export async function luxToDusk(wasm, lux) {
   const args = JSON.stringify({
     lux: lux,
   });
 
-  return jsonFromBytes(call(wasm, args, wasm.lux_to_dusk)).dusk;
+  return parseEncodedJSON(await call(wasm, args, "lux_to_dusk")).dusk;
 }

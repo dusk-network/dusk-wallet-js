@@ -10,6 +10,7 @@ import {
   assert,
 } from "https://deno.land/std@0.207.0/assert/mod.ts";
 import * as path from "https://deno.land/std@0.102.0/path/mod.ts";
-import { initSync } from "./dist/dusk_wallet_core.js";
+import wasmbytecode from "./dist/dusk_wallet_core.js";
+import * as exu from "https://rawcdn.githack.com/dusk-network/exu/v0.1.1/src/mod.js";
 
-export { Dexie, indexedDB, assertEquals, assert, path, initSync };
+export { Dexie, indexedDB, assertEquals, assert, path, wasmbytecode, exu };

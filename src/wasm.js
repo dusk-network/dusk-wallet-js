@@ -4,108 +4,80 @@
 //
 // Copyright (c) DUSK NETWORK. All rights reserved.
 
+const decoder = new TextDecoder();
+const encoder = new TextEncoder();
+
 /**
- * Allocate memory
- * @param {WebAssembly.Exports} wasm
- * @param {Uint8Array} bytes
- * @returns {number} returns the pointer to the allocated buffer
+ * Encodes the string given as Uint8Array.
+ *
+ * @param {string} String to encode
+ * @returns {Uint8Array}
  */
-function alloc(wasm, bytes) {
-  const length = bytes.byteLength;
+export const encode = (string) => encoder.encode(string);
 
-  try {
-    const ptr = wasm.allocate(length);
-    const mem = new Uint8Array(wasm.memory.buffer, ptr, length);
-
-    mem.set(new Uint8Array(bytes));
-    return ptr;
-  } catch (error) {
-    throw new Error("Error allocating memory in wasm: ", +error);
-  }
-}
 /**
- * Deallocate memory
- * @param {WebAssembly.Exports} wasm
- * @param result decomposed result of a wasm call
- * @returns {Uint8Array} memory the function allocated
+ * Decodes the given Uint8Array
+ *
+ * @param {Uint8Array} Buffer to decode
+ * @returns {String}
  */
-function getAndFree(wasm, result) {
-  try {
-    const mem = new Uint8Array(wasm.memory.buffer, result.ptr, result.length);
+export const decode = (buffer, options) => decoder.decode(buffer, options);
 
-    wasm.free_mem(result.ptr, result.length);
-    return mem;
-  } catch (e) {
-    throw new Error("Error while freeing memory: " + e);
-  }
-}
+/**
+ * Decodes the given Uint8Array and parses it as JSON
+ *
+ * @param {Uint8Array} Buffer to decode
+ * @returns {Object}
+ */
+export const parseEncodedJSON = (buffer, reviver) =>
+  JSON.parse(decode(buffer), reviver);
+
 /**
  * Decompose a i64 output from a call into the packed pointer, length and sucess bit
  * @param {BigInt} result result of a wasm call
  * @returns {object} an object containing ptr, length and status bit
  */
 function decompose(result) {
-  const ptr = result >> 32n;
-  const len = ((result << 32n) & ((1n << 64n) - 1n)) >> 40n;
-  const success = ((result << 63n) & ((1n << 64n) - 1n)) >> 63n == 0n;
+  const ptr = Number(result >> 32n);
+  const length = Number(((result << 32n) & ((1n << 64n) - 1n)) >> 40n);
+  const status = ((result << 63n) & ((1n << 64n) - 1n)) >> 63n == 0n;
 
   return {
-    ptr: Number(ptr.toString()),
-    length: Number(len.toString()),
-    status: success,
+    ptr,
+    length,
+    status,
   };
 }
-/**
- * encode the string into bytes
- * @param {string} String to convert to bytes
- * @returns {Uint8Array} bytes from the string
- */
-export const toBytes = (string) => {
-  const utf8Encode = new TextEncoder();
-  const bytes = utf8Encode.encode(string);
 
-  return bytes;
-};
-/**
- * Decode the bytes into string and then json parse it
- * @param {Uint8Array} bytes you want to parse to json
- * @returns {object} Json parsed object
- */
-export function jsonFromBytes(bytes) {
-  const string = new TextDecoder().decode(bytes);
-
-  try {
-    const jsonParsed = JSON.parse(string);
-    return jsonParsed;
-  } catch (e) {
-    throw new Error("Error while parsing json output from function:", e);
-  }
-}
 /**
  * Perform a wasm function call
- * @param {WebAssembly.Exports} wasm
+ *
+ * @param {exu.Module} wasm
  * @param {object} args Arguments of the function in JSON
- * @param {WebAssembly.ExportValue} function_call name of the function you want to call
- * @returns {Uint8Array} bytes return value of the call
+ * @param {String} function_name Function to call
+ * @returns {Promise<Uint8Array>} a promise that resolves to the return value
  */
-export function call(wasm, args, function_call) {
-  const argBytes = toBytes(args);
+export const call = (wasm, args, function_name) =>
+  wasm.task(async (exports, { memcpy }) => {
+    const { allocate, free_mem } = exports;
 
-  // allocate the json we want to send to walconst-core
-  const ptr = alloc(wasm, argBytes);
-  const call = function_call(ptr, argBytes.byteLength);
-  const callResult = decompose(call);
+    const function_call = exports[function_name];
+    const argBytes = encode(args);
+    const { byteLength } = argBytes;
+    const ptr = await allocate(byteLength);
+    await memcpy(ptr, argBytes, byteLength);
+    const call = await function_call(ptr, byteLength);
+    const result = decompose(call);
 
-  if (!callResult.status) {
-    console.error(
-      "Function call " + function_call.name.toString() + " failed!"
-    );
-  }
+    if (!result.status) {
+      throw new Error(`Function ${function_name} failed!`);
+    }
 
-  const bytes = getAndFree(wasm, callResult);
+    const dest = await memcpy(null, result.ptr, result.length);
+    await free_mem(result.ptr, result.length);
 
-  return bytes;
-}
+    return dest;
+  })();
 
 /**
  * Perform a wasm function call with raw bytes
@@ -114,19 +86,22 @@ export function call(wasm, args, function_call) {
  * @param {WebAssembly.ExportValue} function_call name of the function you want to call
  * @returns {Uint8Array} bytes return value of the call
  */
-export function call_raw(wasm, args, function_call) {
-  // allocate the json we want to send to walconst-core
-  const ptr = alloc(wasm, args);
-  const call = function_call(ptr, args.length);
-  const callResult = decompose(call);
+export const call_raw = (wasm, args, function_name) =>
+  wasm.task(async (exports, { memcpy }) => {
+    const { allocate, free_mem } = exports;
+    const function_call = exports[function_name];
 
-  if (!callResult.status) {
-    console.error(
-      "Function call " + function_call.name.toString() + " failed!"
-    );
-  }
+    const { byteLength } = args;
+    const ptr = await allocate(byteLength);
+    await memcpy(ptr, args, byteLength);
+    const call = await function_call(ptr, byteLength);
+    const result = decompose(call);
 
-  const bytes = getAndFree(wasm, callResult);
+    if (!result.status) {
+      throw new Error(`Function ${function_name} failed!`);
+    }
 
-  return bytes;
-}
+    const dest = await memcpy(null, result.ptr, result.length);
+    await free_mem(result.ptr, result.length);
+    return dest;
+  })();

@@ -10,19 +10,11 @@ import { getBalance } from "./balance.js";
 import { transfer } from "./contracts/transfer.js";
 import { txStatus } from "./graphql.js";
 import { sync, stakeInfo } from "./node.js";
-import { generateRandomMnemonic, getSeedFromMnemonic } from "./mnemonic.js";
-import {
-  stake,
-  unstake,
-  withdrawReward,
-} from "./contracts/stake.js";
+import { stake, unstake, withdrawReward } from "./contracts/stake.js";
 import { history } from "./history.js";
 import { clearDB } from "./db.js";
 
-import { initSync } from "../deps.js";
-
-// Export mnemonic functions and other helper functions
-export { generateRandomMnemonic, getSeedFromMnemonic, txStatus };
+import { wasmbytecode, exu } from "../deps.js";
 
 /**
  * Construct a wallet from this function, this function will load the web assembly into the buffer
@@ -34,182 +26,174 @@ export { generateRandomMnemonic, getSeedFromMnemonic, txStatus };
  * @property {number} [gasLimit] The gas limit of the wallet, default is 2900000000
  * @property {number} [gasPrice] The gas price of the wallet, default is 1
  */
-export function Wallet(seed, gasLimit = 2900000000, gasPrice = 1) {
-  const module = initSync();
-  const instance = new WebAssembly.Instance(new WebAssembly.Module(module), {
-    env: {
-      panic: function (ptr, len) {
-        console.log("Panic called");
-      },
-    },
-  });
-
-  this.wasm = instance.exports;
-  this.seed = seed;
-  this.gasLimit = gasLimit;
-  this.gasPrice = gasPrice;
-}
-
-/**
- * Get balance
- * @param {string} psk - bs58 encoded public spend key of the user we want to
- * @returns {Promise<BalanceInfo>} The balance info
- * @memberof Wallet
- */
-Wallet.prototype.getBalance = function (psk) {
-  return getBalance(this.wasm, this.seed, psk);
-};
-
-/**
- * Get psks for the seed
- * @returns {Array<string>} psks Psks of the first 21 address for the seed
- */
-Wallet.prototype.getPsks = function () {
-  return getPsks(this.wasm, this.seed);
-};
-
-/**
- * Sync the wallet
- * @returns {Promise} promise that resolves after the sync is complete
- */
-Wallet.prototype.sync = function () {
-  return sync(this.wasm, this.seed);
-};
-
-/**
- * Transfer Dusk from sender psk to receiver psk
- * @param {string} sender bs58 encoded Psk to send the dusk from
- * @param {string} receiver bs68 encoded psk of the address who will receive the Dusk
- * @param {number} amount Amount of DUSK to send
- * @returns {Promise} promise that resolves after the transfer is accepted into blockchain
- */
-Wallet.prototype.transfer = function (sender, receiver, amount) {
-  return transfer(
-    this.wasm,
-    this.seed,
-    sender,
-    receiver,
-    amount,
-    this.gasLimit,
-    this.gasPrice
-  );
-};
-
-/**
- * Stake Dusk from the provided psk, refund to the same psk
- * @param {string} staker bs58 encoded Psk to stake from
- * @param {number} amount Amount of dusk to stake
- * @returns {Promise} promise that resolves after the stake is accepted into blockchain
- */
-Wallet.prototype.stake = async function (staker, amount) {
-  const minStake = 1000;
-  const index = this.getPsks().indexOf(staker);
-
-  if (amount < minStake) {
-    throw new Error(`Stake amount needs to be above a ${minStake} dusk`);
+export class Wallet {
+  constructor(seed, gasLimit = 2900000000, gasPrice = 1) {
+    this.wasm = new exu.Module(wasmbytecode);
+    this.seed = seed;
+    this.gasLimit = gasLimit;
+    this.gasPrice = gasPrice;
+  }
+  /**
+   * Get balance
+   * @param {string} psk - bs58 encoded public spend key of the user we want to
+   * @returns {Promise<BalanceInfo>} The balance info
+   * @memberof Wallet
+   */
+  getBalance(psk) {
+    return getBalance(this.wasm, this.seed, psk);
   }
 
-  if (index === -1) {
-    throw new Error("Staker psk not found");
+  /**
+   * Get psks for the seed
+   * @returns {Promise<Array<string>>} psks Psks of the first 21 address for the seed
+   */
+  getPsks() {
+    return getPsks(this.wasm, this.seed);
   }
 
-  const bal = await this.getBalance(staker);
+  /**
+   * Sync the wallet
+   * @returns {Promise} promise that resolves after the sync is complete
+   */
+  sync() {
+    return sync(this.wasm, this.seed);
+  }
 
-  if (bal.value < minStake) {
-    throw new Error(
-      `Balance needs to be greater than min stake amount of ${minStake}`
+  /**
+   * Transfer Dusk from sender psk to receiver psk
+   * @param {string} sender bs58 encoded Psk to send the dusk from
+   * @param {string} receiver bs68 encoded psk of the address who will receive the Dusk
+   * @param {number} amount Amount of DUSK to send
+   * @returns {Promise} promise that resolves after the transfer is accepted into blockchain
+   */
+  transfer(sender, receiver, amount) {
+    return transfer(
+      this.wasm,
+      this.seed,
+      sender,
+      receiver,
+      amount,
+      this.gasLimit,
+      this.gasPrice,
     );
-  } else {
-    return stake(
+  }
+
+  /**
+   * Stake Dusk from the provided psk, refund to the same psk
+   * @param {string} staker bs58 encoded Psk to stake from
+   * @param {number} amount Amount of dusk to stake
+   * @returns {Promise} promise that resolves after the stake is accepted into blockchain
+   */
+  async stake(staker, amount) {
+    const minStake = 1000;
+    const index = (await this.getPsks()).indexOf(staker);
+
+    if (amount < minStake) {
+      throw new Error(`Stake amount needs to be above a ${minStake} dusk`);
+    }
+
+    if (index === -1) {
+      throw new Error("Staker psk not found");
+    }
+
+    const bal = await this.getBalance(staker);
+
+    if (bal.value < minStake) {
+      throw new Error(
+        `Balance needs to be greater than min stake amount of ${minStake}`,
+      );
+    } else {
+      return stake(
+        this.wasm,
+        this.seed,
+        index,
+        staker,
+        amount,
+        this.gasLimit,
+        this.gasPrice,
+      );
+    }
+  }
+
+  /**
+   * Fetches the info of the stake if the person has staked
+   * @param {string} psk bs58 encoded Psk of the staker
+   * @returns {Promise<StakeInfo>} The stake info
+   */
+  async stakeInfo(psk) {
+    const index = (await this.getPsks()).indexOf(psk);
+
+    if (index < 0) {
+      throw new Error("Staker psk not found");
+    }
+
+    const info = await stakeInfo(this.wasm, this.seed, index);
+
+    if (info.amount) {
+      info["amount"] = await duskToLux(this.wasm, info.amount);
+    }
+
+    if (info.reward) {
+      info["reward"] = await duskToLux(this.wasm, info.reward);
+    }
+
+    return info;
+  }
+
+  /**
+   * Unstake dusk from the provided psk, refund to the same psk
+   * @param {string} unstaker bs58 encoded psk to unstake from
+   * @returns {Promise} promise that resolves after the unstake is accepted into blockchain
+   */
+  async unstake(unstaker) {
+    const index = (await this.getPsks()).indexOf(unstaker);
+
+    if (index === -1) {
+      throw new Error("psk not found");
+    }
+
+    return unstake(
       this.wasm,
       this.seed,
       index,
-      staker,
-      amount,
+      unstaker,
       this.gasLimit,
-      this.gasPrice
+      this.gasPrice,
     );
   }
-};
 
-/**
- * Fetches the info of the stake if the person has staked
- * @param {string} psk bs58 encoded Psk of the staker
- * @returns {Promise<StakeInfo>} The stake info
- */
-Wallet.prototype.stakeInfo = async function (psk) {
-  const index = this.getPsks().indexOf(psk);
+  /**
+   * Withdraw reward
+   * @param {string} unstaker bs58 encoded psk to unstake from
+   * @returns {Promise} promise that resolves after the unstake is accepted into blockchain
+   */
+  async withdrawReward(psk) {
+    const index = (await this.getPsks()).indexOf(psk);
 
-  if (index < 0) {
-    throw new Error("Staker psk not found");
+    return withdrawReward(
+      this.wasm,
+      this.seed,
+      index,
+      this.gasLimit,
+      this.gasPrice,
+    );
   }
 
-  const info = await stakeInfo(this.wasm, this.seed, index);
-
-  if (info.amount) {
-    info["amount"] = duskToLux(this.wasm, info.amount);
+  /**
+   * Get the history of the wallet
+   *
+   * @param {string} psk - bs58 encoded public spend key of the user we want to fetch the history of
+   * @returns {Array<TxData>} The history of the wallet
+   */
+  history(psk) {
+    return history(this.wasm, this.seed, psk);
   }
 
-  if (info.reward) {
-    info["reward"] = duskToLux(this.wasm, info.reward);
+  /**
+   * Reset the state indexedb db and localStorage
+   * @returns {Promise} promise that resolves after the db is reset
+   */
+  reset() {
+    return clearDB();
   }
-
-  return info;
-};
-
-/**
- * Unstake dusk from the provided psk, refund to the same psk
- * @param {string} unstaker bs58 encoded psk to unstake from
- * @returns {Promise} promise that resolves after the unstake is accepted into blockchain
- */
-Wallet.prototype.unstake = function (unstaker) {
-  const index = this.getPsks().indexOf(unstaker);
-
-  if (index === -1) {
-    throw new Error("psk not found");
-  }
-
-  return unstake(
-    this.wasm,
-    this.seed,
-    index,
-    unstaker,
-    this.gasLimit,
-    this.gasPrice
-  );
-};
-
-/**
- * Withdraw reward
- * @param {string} unstaker bs58 encoded psk to unstake from
- * @returns {Promise} promise that resolves after the unstake is accepted into blockchain
- */
-Wallet.prototype.withdrawReward = function (psk) {
-  const index = this.getPsks().indexOf(psk);
-
-  return withdrawReward(
-    this.wasm,
-    this.seed,
-    index,
-    this.gasLimit,
-    this.gasPrice
-  );
-};
-
-/**
- * Get the history of the wallet
- *
- * @param {string} psk - bs58 encoded public spend key of the user we want to fetch the history of
- * @returns {Array<TxData>} The history of the wallet
- */
-Wallet.prototype.history = function (psk) {
-  return history(this.wasm, this.seed, psk);
-};
-
-/**
- * Reset the state indexedb db and localStorage
- * @returns {Promise} promise that resolves after the db is reset
- */
-Wallet.prototype.reset = function () {
-  return clearDB();
-};
+}

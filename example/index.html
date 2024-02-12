@@ -1,77 +1,80 @@
-<!DOCTYPE html>
+<!doctype html>
 <html>
-  <head> </head>
+    <head> </head>
 
-  <body>
-    <div><p>Well this is awkward</p></div>
-    <script type="module">
-      ReadableStream.prototype[Symbol.asyncIterator] = async function* () {
-        const reader = this.getReader();
-        try {
-          while (true) {
-            const { done, value } = await reader.read();
-            if (done) return;
-            yield value;
-          }
-        } finally {
-          reader.releaseLock();
-        }
-      };
-      import { Wallet, generateRandomMnemonic } from "../dist/wallet.js";
-      // Default wallet seed
-      const seed = [
-        62, 107, 200, 150, 136, 164, 160, 96, 51, 120, 7, 147, 214, 247, 92,
-        129, 153, 233, 162, 121, 45, 209, 233, 4, 196, 182, 194, 50, 226, 95,
-        225, 223, 1, 209, 19, 127, 114, 244, 87, 156, 95, 12, 108, 92, 35, 150,
-        211, 217, 255, 93, 119, 231, 14, 95, 93, 185, 216, 108, 32, 89, 33, 225,
-        58, 184,
-      ];
+    <body>
+        <div><p>Well this is awkward</p></div>
+        <script type="module">
+            ReadableStream.prototype[Symbol.asyncIterator] =
+                async function* () {
+                    const reader = this.getReader();
+                    try {
+                        while (true) {
+                            const { done, value } = await reader.read();
+                            if (done) return;
+                            yield value;
+                        }
+                    } finally {
+                        reader.releaseLock();
+                    }
+                };
+            import { Wallet } from "../dist/wallet.js";
+            // Default wallet seed
+            const seed = [
+                62, 107, 200, 150, 136, 164, 160, 96, 51, 120, 7, 147, 214, 247,
+                92, 129, 153, 233, 162, 121, 45, 209, 233, 4, 196, 182, 194, 50,
+                226, 95, 225, 223, 1, 209, 19, 127, 114, 244, 87, 156, 95, 12,
+                108, 92, 35, 150, 211, 217, 255, 93, 119, 231, 14, 95, 93, 185,
+                216, 108, 32, 89, 33, 225, 58, 184,
+            ];
 
-      let memory;
+            let memory;
 
-      const imports = {
-        env: {
-          log_str(ptr, len) {
-            console.log(readString(ptr, len));
-          },
-        },
-      };
+            const imports = {
+                env: {
+                    log_str(ptr, len) {
+                        console.log(readString(ptr, len));
+                    },
+                },
+            };
 
-      function readString(ptr, len) {
-        const view = new Uint8Array(memory.buffer);
+            function readString(ptr, len) {
+                const view = new Uint8Array(memory.buffer);
 
-        const buf = new Uint8Array(view.subarray(ptr, ptr + len));
-        return new TextDecoder().decode(buf);
-      }
+                const buf = new Uint8Array(view.subarray(ptr, ptr + len));
+                return new TextDecoder().decode(buf);
+            }
 
-      const initWasm = async () => {
-        //   const exports = result.instance.exports;
-        //   memory = exports.memory;
+            const initWasm = async () => {
+                //   const exports = result.instance.exports;
+                //   memory = exports.memory;
 
-        let wallet = new Wallet(seed);
-        let psks = wallet.getPsks();
-        console.log(psks);
+                let wallet = new Wallet(seed);
+                let psks = wallet.getPsks();
+                console.log(psks);
 
-        // console.log(getTreeLeafDeserialized(exports, leaf));
+                // console.log(getTreeLeafDeserialized(exports, leaf));
 
-        var startTime = performance.now();
+                var startTime = performance.now();
 
-        let sync = await wallet.sync();
+                let sync = await wallet.sync();
 
-        var endTime = performance.now();
+                var endTime = performance.now();
 
-        console.log(`Call to sync took ${endTime - startTime} milliseconds`);
+                console.log(
+                    `Call to sync took ${endTime - startTime} milliseconds`,
+                );
 
-        console.log(await wallet.history(psks[0]));
+                console.log(await wallet.history(psks[0]));
 
-        wallet.reset();
+                wallet.reset();
 
-        // await wallet.transfer(psks[0], psks[1], 193);
-      };
+                // await wallet.transfer(psks[0], psks[1], 193);
+            };
 
-      console.log("test");
+            console.log("test");
 
-      initWasm().catch((e) => console.error(e));
-    </script>
-  </body>
+            initWasm().catch((e) => console.error(e));
+        </script>
+    </body>
 </html>

@@ -5,10 +5,29 @@
 // Copyright (c) DUSK NETWORK. All rights reserved.
 
 import { getAllNotes, insertHistory, getHistory } from "./db.js";
-import { call, jsonFromBytes } from "./wasm.js";
+import { call } from "./wasm.js";
+import { parseEncodedJSON } from "./encoding.js";
 import { txFromBlock } from "./graphql.js";
 import { getPsks } from "./keys.js";
 import { duskToLux } from "./crypto.js";
+
+/**
+ * Returns the maximum block height within the list of items given.
+ * The items are expected to have a `block_height` property.
+ *
+ * @param {Array<{block_height: number}>} items
+ * @returns {number} the maximum block height found, or 0.
+ *
+ * It's not possible to use `Math.max` because in certain engine (WebKit)
+ * it's recursive, and it will exceed the stack if the arguments are a lot.
+ *
+ * @see {@link https://stackoverflow.com/questions/42623071/maximum-call-stack-size-exceeded-with-math-min-and-math-max}
+ */
+const maxBlockHeight = (items) =>
+  items.reduce(
+    (max, { block_height }) => (block_height > max ? block_height : max),
+    0,
+  );
 
 /**
  * @class TxData
@@ -47,7 +66,7 @@ export async function history(wasm, seed, psk) {
 
   const notes = await getAllNotes(psk);
 
-  const noteBlockHeights = arrayMax(notes.map((note) => note.block_height));
+  const noteBlockHeights = maxBlockHeight(notes);
 
   if (lastInsertedBlockHeight >= noteBlockHeights) {
     return histData;
@@ -55,7 +74,7 @@ export async function history(wasm, seed, psk) {
 
   const txData = [];
   const noteData = [];
-  const index = getPsks(wasm, seed).indexOf(psk);
+  const index = (await getPsks(wasm, seed)).indexOf(psk);
 
   for (const note of notes) {
     const blockHeight = note.block_height;
@@ -82,14 +101,16 @@ export async function history(wasm, seed, psk) {
     tx_data: txData,
   });
 
-  const result = jsonFromBytes(call(wasm, args, wasm.get_history));
-  const history = result.history.map((tx) => {
-    tx.fee = duskToLux(wasm, parseInt(tx.fee));
+  const result = await call(wasm, args, "get_history").then(parseEncodedJSON);
 
-    return tx;
-  });
+  const history = await Promise.all(
+    result.history.map(async (tx) => {
+      tx.fee = await duskToLux(wasm, parseInt(tx.fee));
+      return tx;
+    }),
+  );
 
-  const lastBlockHeight = arrayMax(histData.map((tx) => tx.block_height));
+  const lastBlockHeight = maxBlockHeight(histData);
 
   const historyData = {
     psk: psk,
@@ -100,19 +121,4 @@ export async function history(wasm, seed, psk) {
   await insertHistory(historyData);
 
   return history;
-}
-/**
- * Find max from an array
- * @param {Array<number>} arr The array to find the max from
- * @returns {number} The max value
- */
-function arrayMax(arr) {
-  let len = arr.length;
-  let max = -Infinity;
-  while (len--) {
-    if (arr[len] > max) {
-      max = arr[len];
-    }
-  }
-  return max;
 }

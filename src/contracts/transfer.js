@@ -19,17 +19,17 @@ import { luxToDusk } from "../crypto.js";
  *
  * @returns {Promise} Promise object which resolves after the tx gets accepted into the blockchain
  */
-export function transfer(
+export async function transfer(
   wasm,
   seed,
   sender,
   receiver,
   amount,
   gasLimit,
-  gasPrice
+  gasPrice,
 ) {
   // convert the amount from lux to dusk
-  amount = luxToDusk(wasm, amount);
+  amount = await luxToDusk(wasm, amount);
 
   const output = {
     receiver: receiver,
@@ -52,6 +52,6 @@ export function transfer(
     undefined,
     undefined,
     gasLimit,
-    gasPrice
+    gasPrice,
   );
 }

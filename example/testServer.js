@@ -10,7 +10,7 @@ app.use(async (ctx, next) => {
   ctx.response.headers.set("Access-Control-Allow-Origin", "*"); // * for all servers, you can use your own server address
   ctx.response.headers.set(
     "Access-Control-Allow-Methods",
-    "GET, POST, PUT, DELETE, OPTIONS"
+    "GET, POST, PUT, DELETE, OPTIONS",
   ); // Which methods you want to allow
   ctx.response.headers.set("Access-Control-Allow-Headers", "Content-Type"); // If your request body has json
   await next(); // If you use async await in other middlewares, you must use async await here
@@ -28,7 +28,7 @@ app.use(async (context, next) => {
 });
 
 console.log(
-  "Starting example server at http://127.0.0.1:8000/example/index.html"
+  "Starting example server at http://127.0.0.1:8000/example/index.html",
 );
 
 await app.listen({ port: 8000 });

@@ -4,8 +4,9 @@
 //
 // Copyright (c) DUSK NETWORK. All rights reserved.
 
-import { call, jsonFromBytes } from "./wasm.js";
-import { getUnpsentNotes } from "./db.js";
+import { call } from "./wasm.js";
+import { parseEncodedJSON } from "./encoding.js";
+import { getUnspentNotes } from "./db.js";
 import { getNotesRkyvSerialized } from "./rkyv.js";
 import { duskToLux } from "./crypto.js";
 
@@ -30,22 +31,22 @@ export function BalanceInfo(value, maximum) {
  * @ignore Ignored because you only call this through the Wallet class
  */
 export async function getBalance(wasm, seed, psk) {
-  const notes = await getUnpsentNotes(psk);
+  const notes = await getUnspentNotes(psk);
 
   const unspentNotes = notes.map((object) => object.note);
 
-  const serializedNotes = getNotesRkyvSerialized(wasm, unspentNotes);
+  const serializedNotes = await getNotesRkyvSerialized(wasm, unspentNotes);
 
   const balanceArgs = JSON.stringify({
     seed: Array.from(seed),
     notes: Array.from(serializedNotes),
   });
 
-  const obj = jsonFromBytes(call(wasm, balanceArgs, wasm.balance));
+  const obj = await call(wasm, balanceArgs, "balance").then(parseEncodedJSON);
 
-  // convert the dusk values to lux
-  obj.value = duskToLux(wasm, obj.value);
-  obj.maximum = duskToLux(wasm, obj.maximum);
+  // console the dusk values to lux
+  obj.value = await duskToLux(wasm, obj.value);
+  obj.maximum = await duskToLux(wasm, obj.maximum);
 
   return obj;
 }

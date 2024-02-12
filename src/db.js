@@ -75,7 +75,7 @@ export async function insertSpentUnspentNotes(unspentNotes, spentNotes, pos) {
       console.error(
         "Some insert operations did not while pushing unspent notes. " +
           e.failures.length +
-          " failures"
+          " failures",
       );
     });
 
@@ -92,7 +92,7 @@ export async function insertSpentUnspentNotes(unspentNotes, spentNotes, pos) {
       console.error(
         "Some insert operations did not while pushing spent notes. " +
           e.failures.length +
-          " failures"
+          " failures",
       );
     });
 }
@@ -104,7 +104,7 @@ export async function insertSpentUnspentNotes(unspentNotes, spentNotes, pos) {
  * @returns {Promise<Array<NoteData>>} notes - unspent notes belonging to the psk
  * @ignore Only called by the sync function
  */
-export async function getUnpsentNotes(psk) {
+export async function getUnspentNotes(psk) {
   const db = initializeState();
 
   const myTable = db.table("unspentNotes");
@@ -232,9 +232,9 @@ export async function correctNotes(wasm) {
 
   // start the correction of the notes
   // get the nullifiers
-  const unspentNotesNullifiersSerialized = getNullifiersRkyvSerialized(
+  const unspentNotesNullifiersSerialized = await getNullifiersRkyvSerialized(
     wasm,
-    unspentNotesNullifiers
+    unspentNotesNullifiers,
   );
 
   // Fetch existing nullifiers from the node
@@ -242,20 +242,20 @@ export async function correctNotes(wasm) {
     await request(
       unspentNotesNullifiersSerialized,
       "existing_nullifiers",
-      false
-    )
+      false,
+    ),
   );
 
   // calculate the unspent and spent notes
   // from all the unspent note in the db
   // their nullifiers
-  const correctedNotes = unspentSpentNotes(
+  const correctedNotes = await unspentSpentNotes(
     wasm,
     unspentNotesTemp,
     unspentNotesNullifiers,
     unspentNotesBlockHeights,
     unspentNotesExistingNullifiersBytes,
-    unspentNotesPsks
+    unspentNotesPsks,
   );
 
   // These are the spent notes which were unspent before
@@ -278,7 +278,8 @@ export async function insertHistory(historyData) {
   historyData.history = existingHistory.history
     .concat(historyData.history)
     .filter(
-      (v, i, a) => a.findIndex((v2) => v2.block_height === v.block_height) === i
+      (v, i, a) =>
+        a.findIndex((v2) => v2.block_height === v.block_height) === i,
     );
 
   await db.cache
@@ -290,7 +291,7 @@ export async function insertHistory(historyData) {
     })
     .catch(function (e) {
       console.error(
-        "Some insert operations did not while pushing history data. " + e
+        "Some insert operations did not while pushing history data. " + e,
       );
     });
 }

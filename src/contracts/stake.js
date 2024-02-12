@@ -4,7 +4,8 @@
 //
 // Copyright (c) DUSK NETWORK. All rights reserved.
 
-import { call, jsonFromBytes } from "../wasm.js";
+import { call } from "../wasm.js";
+import { parseEncodedJSON } from "../encoding.js";
 import { luxToDusk } from "../crypto.js";
 import { request, stakeInfo } from "../node.js";
 import { execute } from "../execute.js";
@@ -31,13 +32,13 @@ export async function stake(
   refund,
   amount,
   gasLimit,
-  gasPrice
+  gasPrice,
 ) {
   const rng_seed = new Uint8Array(32);
   crypto.getRandomValues(rng_seed);
 
   // convert the amount from lux to dusk
-  amount = luxToDusk(wasm, amount);
+  amount = await luxToDusk(wasm, amount);
 
   const info = await stakeInfo(wasm, seed, senderIndex);
 
@@ -61,7 +62,9 @@ export async function stake(
     gas_price: gasPrice,
   });
 
-  const stctProofArgs = jsonFromBytes(call(wasm, args, wasm.get_stct_proof));
+  const stctProofArgs = await call(wasm, args, "get_stct_proof").then(
+    parseEncodedJSON,
+  );
 
   const stctProofBytes = stctProofArgs.bytes;
   const crossover = stctProofArgs.crossover;
@@ -74,13 +77,13 @@ export async function stake(
     false,
     PROVER,
     "rusk",
-    "2"
+    "2",
   );
 
   const bufferStctProofReq = await stctProofReq.arrayBuffer();
 
   console.log(
-    "stct proof request response length: " + bufferStctProofReq.byteLength
+    "stct proof request response length: " + bufferStctProofReq.byteLength,
   );
 
   const callDataArgs = JSON.stringify({
@@ -91,18 +94,20 @@ export async function stake(
     counter: counter,
   });
 
-  const stakeCallData = jsonFromBytes(
-    call(wasm, callDataArgs, wasm.get_stake_call_data)
-  );
+  const stakeCallData = await call(
+    wasm,
+    callDataArgs,
+    "get_stake_call_data",
+  ).then(parseEncodedJSON);
 
   const contract = stakeCallData.contract;
   const method = stakeCallData.method;
   const payload = stakeCallData.payload;
 
   const callData = {
-    contract: contract,
-    method: method,
-    payload: payload,
+    contract,
+    method,
+    payload,
   };
 
   const crossoverType = {
@@ -121,7 +126,7 @@ export async function stake(
     crossoverType,
     fee,
     gasLimit,
-    gasPrice
+    gasPrice,
   );
 }
 
@@ -142,7 +147,7 @@ export async function unstake(
   sender_index,
   refund,
   gasLimit,
-  gasPrice
+  gasPrice,
 ) {
   const rng_seed = new Uint8Array(32);
   crypto.getRandomValues(rng_seed);
@@ -171,7 +176,9 @@ export async function unstake(
     gas_price: gasPrice,
   });
 
-  const wfctProofArgs = jsonFromBytes(call(wasm, args, wasm.get_wfct_proof));
+  const wfctProofArgs = await call(wasm, args, "get_wfct_proof").then(
+    parseEncodedJSON,
+  );
   const wfctProofBytes = wfctProofArgs.bytes;
   const crossover = wfctProofArgs.crossover;
   const blinder = wfctProofArgs.blinder;
@@ -184,13 +191,13 @@ export async function unstake(
     false,
     PROVER,
     "rusk",
-    "2"
+    "2",
   );
 
   const bufferWfctProofReq = await wfctProofReq.arrayBuffer();
 
   console.log(
-    "wfct proof request response length: " + bufferWfctProofReq.byteLength
+    "wfct proof request response length: " + bufferWfctProofReq.byteLength,
   );
 
   const callDataArgs = JSON.stringify({
@@ -201,9 +208,11 @@ export async function unstake(
     counter: counter,
   });
 
-  const unstakeCallData = jsonFromBytes(
-    call(wasm, callDataArgs, wasm.get_unstake_call_data)
-  );
+  const unstakeCallData = await call(
+    wasm,
+    callDataArgs,
+    "get_unstake_call_data",
+  ).then(parseEncodedJSON);
 
   const contract = unstakeCallData.contract;
   const method = unstakeCallData.method;
@@ -231,7 +240,7 @@ export async function unstake(
     crossoverType,
     fee,
     gasLimit,
-    gasPrice
+    gasPrice,
   );
 }
 
@@ -250,19 +259,19 @@ export async function withdrawReward(
   seed,
   staker_index,
   gasLimit,
-  gasPrice
+  gasPrice,
 ) {
   const rng_seed = new Uint8Array(32);
   crypto.getRandomValues(rng_seed);
 
   const info = await stakeInfo(wasm, seed, staker_index);
 
-  const refund = getPsks(wasm, seed)[staker_index];
+  const refund = (await getPsks(wasm, seed))[staker_index];
 
   // check if reward exists
   if (!info.has_staked || info.reward <= 0) {
     throw new Error(
-      "No reward to withdraw, take part in concensus to recieve reward"
+      "No reward to withdraw, take part in concensus to recieve reward",
     );
   }
   let counter = 0;
@@ -282,9 +291,11 @@ export async function withdrawReward(
     gas_price: gasPrice,
   });
 
-  const withdrawCallData = jsonFromBytes(
-    call(wasm, args, wasm.get_withdraw_call_data)
-  );
+  const withdrawCallData = await call(
+    wasm,
+    args,
+    "get_withdraw_call_data",
+  ).then(parseEncodedJSON);
 
   const callData = {
     contract: withdrawCallData.contract,
@@ -308,6 +319,6 @@ export async function withdrawReward(
     crossoverType,
     withdrawCallData.fee,
     gasLimit,
-    gasPrice
+    gasPrice,
   );
 }
