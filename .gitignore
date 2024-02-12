@@ -3,7 +3,6 @@
 /npm
 /dist
 /pkg
-/assets
 
 **/.DS_Store
 **/*.lock

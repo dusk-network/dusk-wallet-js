@@ -19,9 +19,17 @@ if (!walletCorePath) {
 const wasmbytecode = await Deno.readFile(walletCorePath);
 const walletCoreFile = path.parse(walletCorePath);
 
+const [fileName, version] = walletCoreFile.name.split("@");
+
+console.info(
+  `%cBuilding %c${fileName} ${version ? "v" + version : ""}`,
+  "color: green",
+  "",
+);
+
 await ensureDir("./dist");
 await Deno.writeTextFile(
-  `./dist/${walletCoreFile.name}.js`,
+  `./dist/${fileName}.js`,
   `export default new Uint8Array([${wasmbytecode.join()}])`,
 );
 
