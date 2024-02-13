@@ -81,5 +81,6 @@ await build({
   },
 }).finally(async () => {
   // Checkout back
+  await git.fetch();
   await git.checkout("-");
 });
