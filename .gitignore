@@ -1,0 +1,7 @@
+/cache
+/out
+/npm
+/pkg
+
+**/.DS_Store
+**/*.lock
