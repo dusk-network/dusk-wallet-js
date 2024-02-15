@@ -97,8 +97,6 @@ export async function execute(
     gas_price: gas_price,
   };
 
-  console.log(args);
-
   const unprovenTx = parseEncodedJSON(await call(wasm, args, "execute")).tx;
 
   const varBytes = await getUnprovenTxVarBytes(wasm, unprovenTx);

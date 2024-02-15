@@ -151,7 +151,7 @@ export function request(
   body.set(new Uint8Array(data), number.length + request_name_bytes.length);
   const headers = {
     "Content-Type": "application/octet-stream",
-    "rusk-version": "0.7.0-rc",
+    "rusk-version": "0.7.0",
   };
 
   if (stream) {

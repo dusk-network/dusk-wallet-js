@@ -41,19 +41,3 @@ Deno.test({
     assert(checkIfMade);
   },
 });
-
-Deno.test({
-  name: "console.log hash of the dusk_wallet_core.js",
-  async fn() {
-    const command = new Deno.Command("deno", {
-      args: ["info", "./src/mod.js"],
-    });
-
-    // create subprocess and collect output
-    const { code, stdout, stderr } = await command.output();
-
-    console.log(new TextDecoder().decode(stdout));
-
-    // await ensureSuccess(output);
-  },
-});
