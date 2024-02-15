@@ -5277,7 +5277,7 @@ function propagateMessageLocally(_a2) {
 DexiePromise.rejectionMapper = mapError;
 setDebug(debug, dexieStackFrameFilter);
 
-// ../../../Library/Caches/deno/deno_esbuild/fake-indexeddb@5.0.1/node_modules/fake-indexeddb/build/esm/lib/errors.js
+// ../../../Library/Caches/deno/deno_esbuild/fake-indexeddb@5.0.2/node_modules/fake-indexeddb/build/esm/lib/errors.js
 var messages = {
   AbortError: "A request was aborted, for example through a call to IDBTransaction.abort.",
   ConstraintError: "A mutation operation in the transaction failed because a constraint was not satisfied. For example, an object such as an object store or index already exists and a request attempted to create a new one.",
@@ -5354,7 +5354,7 @@ var VersionError = class extends Error {
   }
 };
 
-// ../../../Library/Caches/deno/deno_esbuild/fake-indexeddb@5.0.1/node_modules/fake-indexeddb/build/esm/lib/valueToKey.js
+// ../../../Library/Caches/deno/deno_esbuild/fake-indexeddb@5.0.2/node_modules/fake-indexeddb/build/esm/lib/valueToKey.js
 var valueToKey = (input, seen) => {
   if (typeof input === "number") {
     if (isNaN(input)) {
@@ -5409,7 +5409,7 @@ var valueToKey = (input, seen) => {
 };
 var valueToKey_default = valueToKey;
 
-// ../../../Library/Caches/deno/deno_esbuild/fake-indexeddb@5.0.1/node_modules/fake-indexeddb/build/esm/lib/cmp.js
+// ../../../Library/Caches/deno/deno_esbuild/fake-indexeddb@5.0.2/node_modules/fake-indexeddb/build/esm/lib/cmp.js
 var getType = (x) => {
   if (typeof x === "number") {
     return "Number";
@@ -5484,7 +5484,7 @@ var cmp2 = (first, second) => {
 };
 var cmp_default = cmp2;
 
-// ../../../Library/Caches/deno/deno_esbuild/fake-indexeddb@5.0.1/node_modules/fake-indexeddb/build/esm/FDBKeyRange.js
+// ../../../Library/Caches/deno/deno_esbuild/fake-indexeddb@5.0.2/node_modules/fake-indexeddb/build/esm/FDBKeyRange.js
 var FDBKeyRange = class _FDBKeyRange {
   static only(value) {
     if (arguments.length === 0) {
@@ -5551,7 +5551,7 @@ var FDBKeyRange = class _FDBKeyRange {
 };
 var FDBKeyRange_default = FDBKeyRange;
 
-// ../../../Library/Caches/deno/deno_esbuild/fake-indexeddb@5.0.1/node_modules/fake-indexeddb/build/esm/lib/extractKey.js
+// ../../../Library/Caches/deno/deno_esbuild/fake-indexeddb@5.0.2/node_modules/fake-indexeddb/build/esm/lib/extractKey.js
 var extractKey = (keyPath, value) => {
   if (Array.isArray(keyPath)) {
     const result = [];
@@ -5587,7 +5587,7 @@ var extractKey = (keyPath, value) => {
 };
 var extractKey_default = extractKey;
 
-// ../../../Library/Caches/deno/deno_esbuild/fake-indexeddb@5.0.1/node_modules/fake-indexeddb/build/esm/FDBCursor.js
+// ../../../Library/Caches/deno/deno_esbuild/fake-indexeddb@5.0.2/node_modules/fake-indexeddb/build/esm/FDBCursor.js
 var getEffectiveObjectStore = (cursor) => {
   if (cursor.source instanceof FDBObjectStore_default) {
     return cursor.source;
@@ -6019,7 +6019,7 @@ var FDBCursor = class {
 };
 var FDBCursor_default = FDBCursor;
 
-// ../../../Library/Caches/deno/deno_esbuild/fake-indexeddb@5.0.1/node_modules/fake-indexeddb/build/esm/FDBCursorWithValue.js
+// ../../../Library/Caches/deno/deno_esbuild/fake-indexeddb@5.0.2/node_modules/fake-indexeddb/build/esm/FDBCursorWithValue.js
 var FDBCursorWithValue = class extends FDBCursor_default {
   value = void 0;
   constructor(source, range, direction, request2) {
@@ -6031,7 +6031,7 @@ var FDBCursorWithValue = class extends FDBCursor_default {
 };
 var FDBCursorWithValue_default = FDBCursorWithValue;
 
-// ../../../Library/Caches/deno/deno_esbuild/fake-indexeddb@5.0.1/node_modules/fake-indexeddb/build/esm/lib/FakeEventTarget.js
+// ../../../Library/Caches/deno/deno_esbuild/fake-indexeddb@5.0.2/node_modules/fake-indexeddb/build/esm/lib/FakeEventTarget.js
 var stopped = (event, listener) => {
   return event.immediatePropagationStopped || event.eventPhase === event.CAPTURING_PHASE && listener.capture === false || event.eventPhase === event.BUBBLING_PHASE && listener.capture === true;
 };
@@ -6122,7 +6122,7 @@ var FakeEventTarget = class {
 };
 var FakeEventTarget_default = FakeEventTarget;
 
-// ../../../Library/Caches/deno/deno_esbuild/fake-indexeddb@5.0.1/node_modules/fake-indexeddb/build/esm/FDBRequest.js
+// ../../../Library/Caches/deno/deno_esbuild/fake-indexeddb@5.0.2/node_modules/fake-indexeddb/build/esm/FDBRequest.js
 var FDBRequest = class extends FakeEventTarget_default {
   _result = null;
   _error = null;
@@ -6155,7 +6155,7 @@ var FDBRequest = class extends FakeEventTarget_default {
 };
 var FDBRequest_default = FDBRequest;
 
-// ../../../Library/Caches/deno/deno_esbuild/fake-indexeddb@5.0.1/node_modules/fake-indexeddb/build/esm/lib/enforceRange.js
+// ../../../Library/Caches/deno/deno_esbuild/fake-indexeddb@5.0.2/node_modules/fake-indexeddb/build/esm/lib/enforceRange.js
 var enforceRange = (num, type2) => {
   const min = 0;
   const max = type2 === "unsigned long" ? 4294967295 : 9007199254740991;
@@ -6168,7 +6168,7 @@ var enforceRange = (num, type2) => {
 };
 var enforceRange_default = enforceRange;
 
-// ../../../Library/Caches/deno/deno_esbuild/fake-indexeddb@5.0.1/node_modules/fake-indexeddb/build/esm/lib/FakeDOMStringList.js
+// ../../../Library/Caches/deno/deno_esbuild/fake-indexeddb@5.0.2/node_modules/fake-indexeddb/build/esm/lib/FakeDOMStringList.js
 var FakeDOMStringList = class extends Array {
   contains(value) {
     for (const value2 of this) {
@@ -6194,7 +6194,7 @@ var FakeDOMStringList = class extends Array {
 };
 var FakeDOMStringList_default = FakeDOMStringList;
 
-// ../../../Library/Caches/deno/deno_esbuild/fake-indexeddb@5.0.1/node_modules/fake-indexeddb/build/esm/lib/valueToKeyRange.js
+// ../../../Library/Caches/deno/deno_esbuild/fake-indexeddb@5.0.2/node_modules/fake-indexeddb/build/esm/lib/valueToKeyRange.js
 var valueToKeyRange = (value, nullDisallowedFlag = false) => {
   if (value instanceof FDBKeyRange_default) {
     return value;
@@ -6210,7 +6210,7 @@ var valueToKeyRange = (value, nullDisallowedFlag = false) => {
 };
 var valueToKeyRange_default = valueToKeyRange;
 
-// ../../../Library/Caches/deno/deno_esbuild/fake-indexeddb@5.0.1/node_modules/fake-indexeddb/build/esm/FDBIndex.js
+// ../../../Library/Caches/deno/deno_esbuild/fake-indexeddb@5.0.2/node_modules/fake-indexeddb/build/esm/FDBIndex.js
 var confirmActiveTransaction = (index) => {
   if (index._rawIndex.deleted || index.objectStore._rawObjectStore.deleted) {
     throw new InvalidStateError();
@@ -6366,12 +6366,7 @@ var FDBIndex = class {
     }
     return this.objectStore.transaction._execRequestAsync({
       operation: () => {
-        let count = 0;
-        const cursor = new FDBCursor_default(this, key);
-        while (cursor._iterate() !== null) {
-          count += 1;
-        }
-        return count;
+        return this._rawIndex.count(key);
       },
       source: this
     });
@@ -6382,7 +6377,7 @@ var FDBIndex = class {
 };
 var FDBIndex_default = FDBIndex;
 
-// ../../../Library/Caches/deno/deno_esbuild/fake-indexeddb@5.0.1/node_modules/fake-indexeddb/build/esm/lib/canInjectKey.js
+// ../../../Library/Caches/deno/deno_esbuild/fake-indexeddb@5.0.2/node_modules/fake-indexeddb/build/esm/lib/canInjectKey.js
 var canInjectKey = (keyPath, value) => {
   if (Array.isArray(keyPath)) {
     throw new Error("The key paths used in this section are always strings and never sequences, since it is not possible to create a object store which has a key generator and also has a key path that is a sequence.");
@@ -6406,7 +6401,7 @@ var canInjectKey = (keyPath, value) => {
 };
 var canInjectKey_default = canInjectKey;
 
-// ../../../Library/Caches/deno/deno_esbuild/fake-indexeddb@5.0.1/node_modules/fake-indexeddb/build/esm/lib/binarySearch.js
+// ../../../Library/Caches/deno/deno_esbuild/fake-indexeddb@5.0.2/node_modules/fake-indexeddb/build/esm/lib/binarySearch.js
 function binarySearch(records, key) {
   let low = 0;
   let high = records.length;
@@ -6457,7 +6452,7 @@ function getIndexByKeyGTE(records, key) {
   return -1;
 }
 
-// ../../../Library/Caches/deno/deno_esbuild/fake-indexeddb@5.0.1/node_modules/fake-indexeddb/build/esm/lib/RecordStore.js
+// ../../../Library/Caches/deno/deno_esbuild/fake-indexeddb@5.0.2/node_modules/fake-indexeddb/build/esm/lib/RecordStore.js
 var RecordStore = class {
   records = [];
   get(key) {
@@ -6581,7 +6576,7 @@ var RecordStore = class {
 };
 var RecordStore_default = RecordStore;
 
-// ../../../Library/Caches/deno/deno_esbuild/fake-indexeddb@5.0.1/node_modules/fake-indexeddb/build/esm/lib/Index.js
+// ../../../Library/Caches/deno/deno_esbuild/fake-indexeddb@5.0.2/node_modules/fake-indexeddb/build/esm/lib/Index.js
 var Index = class {
   deleted = false;
   // Initialized should be used to decide whether to throw an error or abort the versionchange transaction when there is a
@@ -6711,10 +6706,17 @@ var Index = class {
       source: null
     });
   }
+  count(range) {
+    let count = 0;
+    for (const record of this.records.values(range)) {
+      count += 1;
+    }
+    return count;
+  }
 };
 var Index_default = Index;
 
-// ../../../Library/Caches/deno/deno_esbuild/fake-indexeddb@5.0.1/node_modules/fake-indexeddb/build/esm/lib/validateKeyPath.js
+// ../../../Library/Caches/deno/deno_esbuild/fake-indexeddb@5.0.2/node_modules/fake-indexeddb/build/esm/lib/validateKeyPath.js
 var validateKeyPath = (keyPath, parent) => {
   if (keyPath !== void 0 && keyPath !== null && typeof keyPath !== "string" && keyPath.toString && (parent === "array" || !Array.isArray(keyPath))) {
     keyPath = keyPath.toString();
@@ -6757,7 +6759,7 @@ var validateKeyPath = (keyPath, parent) => {
 };
 var validateKeyPath_default = validateKeyPath;
 
-// ../../../Library/Caches/deno/deno_esbuild/fake-indexeddb@5.0.1/node_modules/fake-indexeddb/build/esm/FDBObjectStore.js
+// ../../../Library/Caches/deno/deno_esbuild/fake-indexeddb@5.0.2/node_modules/fake-indexeddb/build/esm/FDBObjectStore.js
 var confirmActiveTransaction2 = (objectStore) => {
   if (objectStore._rawObjectStore.deleted) {
     throw new InvalidStateError();
@@ -7087,12 +7089,7 @@ var FDBObjectStore = class {
     }
     return this.transaction._execRequestAsync({
       operation: () => {
-        let count = 0;
-        const cursor = new FDBCursor_default(this, key);
-        while (cursor._iterate() !== null) {
-          count += 1;
-        }
-        return count;
+        return this._rawObjectStore.count(key);
       },
       source: this
     });
@@ -7103,7 +7100,7 @@ var FDBObjectStore = class {
 };
 var FDBObjectStore_default = FDBObjectStore;
 
-// ../../../Library/Caches/deno/deno_esbuild/fake-indexeddb@5.0.1/node_modules/fake-indexeddb/build/esm/lib/FakeEvent.js
+// ../../../Library/Caches/deno/deno_esbuild/fake-indexeddb@5.0.2/node_modules/fake-indexeddb/build/esm/lib/FakeEvent.js
 var Event = class {
   eventPath = [];
   NONE = 0;
@@ -7142,7 +7139,7 @@ var Event = class {
 };
 var FakeEvent_default = Event;
 
-// ../../../Library/Caches/deno/deno_esbuild/fake-indexeddb@5.0.1/node_modules/fake-indexeddb/build/esm/lib/scheduling.js
+// ../../../Library/Caches/deno/deno_esbuild/fake-indexeddb@5.0.2/node_modules/fake-indexeddb/build/esm/lib/scheduling.js
 function getSetImmediateFromJsdom() {
   if (typeof navigator !== "undefined" && /jsdom/.test(navigator.userAgent)) {
     const outerRealmFunctionConstructor = Node.constructor;
@@ -7153,7 +7150,7 @@ function getSetImmediateFromJsdom() {
 }
 var queueTask = globalThis.setImmediate || getSetImmediateFromJsdom() || ((fn) => setTimeout(fn, 0));
 
-// ../../../Library/Caches/deno/deno_esbuild/fake-indexeddb@5.0.1/node_modules/fake-indexeddb/build/esm/FDBTransaction.js
+// ../../../Library/Caches/deno/deno_esbuild/fake-indexeddb@5.0.2/node_modules/fake-indexeddb/build/esm/FDBTransaction.js
 var FDBTransaction = class extends FakeEventTarget_default {
   _state = "active";
   _started = false;
@@ -7336,7 +7333,7 @@ var FDBTransaction = class extends FakeEventTarget_default {
 };
 var FDBTransaction_default = FDBTransaction;
 
-// ../../../Library/Caches/deno/deno_esbuild/fake-indexeddb@5.0.1/node_modules/fake-indexeddb/build/esm/lib/KeyGenerator.js
+// ../../../Library/Caches/deno/deno_esbuild/fake-indexeddb@5.0.2/node_modules/fake-indexeddb/build/esm/lib/KeyGenerator.js
 var MAX_KEY = 9007199254740992;
 var KeyGenerator = class {
   // This is kind of wrong. Should start at 1 and increment only after record is saved
@@ -7358,7 +7355,7 @@ var KeyGenerator = class {
 };
 var KeyGenerator_default = KeyGenerator;
 
-// ../../../Library/Caches/deno/deno_esbuild/fake-indexeddb@5.0.1/node_modules/fake-indexeddb/build/esm/lib/ObjectStore.js
+// ../../../Library/Caches/deno/deno_esbuild/fake-indexeddb@5.0.2/node_modules/fake-indexeddb/build/esm/lib/ObjectStore.js
 var ObjectStore = class {
   deleted = false;
   records = new RecordStore_default();
@@ -7503,10 +7500,17 @@ var ObjectStore = class {
       rawIndex.records.clear();
     }
   }
+  count(range) {
+    let count = 0;
+    for (const record of this.records.values(range)) {
+      count += 1;
+    }
+    return count;
+  }
 };
 var ObjectStore_default = ObjectStore;
 
-// ../../../Library/Caches/deno/deno_esbuild/fake-indexeddb@5.0.1/node_modules/fake-indexeddb/build/esm/FDBDatabase.js
+// ../../../Library/Caches/deno/deno_esbuild/fake-indexeddb@5.0.2/node_modules/fake-indexeddb/build/esm/FDBDatabase.js
 var confirmActiveVersionchangeTransaction = (database) => {
   if (!database._runningVersionchangeTransaction) {
     throw new InvalidStateError();
@@ -7648,7 +7652,7 @@ var FDBDatabase = class extends FakeEventTarget_default {
 };
 var FDBDatabase_default = FDBDatabase;
 
-// ../../../Library/Caches/deno/deno_esbuild/fake-indexeddb@5.0.1/node_modules/fake-indexeddb/build/esm/FDBOpenDBRequest.js
+// ../../../Library/Caches/deno/deno_esbuild/fake-indexeddb@5.0.2/node_modules/fake-indexeddb/build/esm/FDBOpenDBRequest.js
 var FDBOpenDBRequest = class extends FDBRequest_default {
   onupgradeneeded = null;
   onblocked = null;
@@ -7658,7 +7662,7 @@ var FDBOpenDBRequest = class extends FDBRequest_default {
 };
 var FDBOpenDBRequest_default = FDBOpenDBRequest;
 
-// ../../../Library/Caches/deno/deno_esbuild/fake-indexeddb@5.0.1/node_modules/fake-indexeddb/build/esm/FDBVersionChangeEvent.js
+// ../../../Library/Caches/deno/deno_esbuild/fake-indexeddb@5.0.2/node_modules/fake-indexeddb/build/esm/FDBVersionChangeEvent.js
 var FDBVersionChangeEvent = class extends FakeEvent_default {
   constructor(type2, parameters = {}) {
     super(type2);
@@ -7671,7 +7675,7 @@ var FDBVersionChangeEvent = class extends FakeEvent_default {
 };
 var FDBVersionChangeEvent_default = FDBVersionChangeEvent;
 
-// ../../../Library/Caches/deno/deno_esbuild/fake-indexeddb@5.0.1/node_modules/fake-indexeddb/build/esm/lib/Database.js
+// ../../../Library/Caches/deno/deno_esbuild/fake-indexeddb@5.0.2/node_modules/fake-indexeddb/build/esm/lib/Database.js
 var Database = class {
   deletePending = false;
   transactions = [];
@@ -7702,7 +7706,7 @@ var Database = class {
 };
 var Database_default = Database;
 
-// ../../../Library/Caches/deno/deno_esbuild/fake-indexeddb@5.0.1/node_modules/fake-indexeddb/build/esm/FDBFactory.js
+// ../../../Library/Caches/deno/deno_esbuild/fake-indexeddb@5.0.2/node_modules/fake-indexeddb/build/esm/FDBFactory.js
 var waitForOthersClosedDelete = (databases, name, openDatabases, cb) => {
   const anyOpen = openDatabases.some((openDatabase2) => {
     return !openDatabase2._closed && !openDatabase2._closePending;
@@ -7932,7 +7936,7 @@ var FDBFactory = class {
 };
 var FDBFactory_default = FDBFactory;
 
-// ../../../Library/Caches/deno/deno_esbuild/fake-indexeddb@5.0.1/node_modules/fake-indexeddb/build/esm/fakeIndexedDB.js
+// ../../../Library/Caches/deno/deno_esbuild/fake-indexeddb@5.0.2/node_modules/fake-indexeddb/build/esm/fakeIndexedDB.js
 var fakeIndexedDB = new FDBFactory_default();
 var fakeIndexedDB_default = fakeIndexedDB;
 
