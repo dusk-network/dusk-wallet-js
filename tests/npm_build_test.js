@@ -46,7 +46,7 @@ Deno.test({
   name: "console.log hash of the dusk_wallet_core.js",
   async fn() {
     const command = new Deno.Command("git", {
-      args: ["hash-object", "./dist/dusk_wallet_core.js"],
+      args: ["hash-object", "./dist/wallet.js"],
     });
 
     // create subprocess and collect output
@@ -54,6 +54,6 @@ Deno.test({
 
     console.log(new TextDecoder().decode(stdout));
 
-    //await ensureSuccess(output);
+    // await ensureSuccess(output);
   },
 });
