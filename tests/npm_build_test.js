@@ -49,7 +49,7 @@ Deno.test({
       args: ["hash-object", "./dist/dusk_wallet_core.js"],
     });
 
-    const output = command.output();
+    const output = await command.output();
 
     console.log(output);
 
