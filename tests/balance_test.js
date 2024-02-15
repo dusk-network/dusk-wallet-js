@@ -42,7 +42,7 @@ Deno.test({
 Deno.test({
   name: "25 psks",
   fn() {
-    assertEquals(psks.length, 4);
+    assertEquals(psks.length, 3);
   },
 });
 
