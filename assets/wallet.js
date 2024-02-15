@@ -100,7 +100,7 @@ async function luxToDusk(wasm, lux) {
   return parseEncodedJSON(await call(wasm, args, "lux_to_dusk")).dusk;
 }
 
-// https://unpkg.com/dexie@3.2.4/dist/dexie.mjs
+// https://unpkg.com/dexie@3.2.5/dist/dexie.mjs
 var __assign = function() {
   __assign = Object.assign || function __assign2(t) {
     for (var s, i = 1, n = arguments.length; i < n; i++) {
@@ -204,7 +204,7 @@ function tryCatch(fn, onerror, args) {
   }
 }
 function getByKeyPath(obj, keyPath) {
-  if (hasOwn(obj, keyPath))
+  if (typeof keyPath === "string" && hasOwn(obj, keyPath))
     return obj[keyPath];
   if (!keyPath)
     return obj;
@@ -283,7 +283,7 @@ var concat = [].concat;
 function flatten(a) {
   return concat.apply([], a);
 }
-var intrinsicTypeNames = "Boolean,String,Date,RegExp,Blob,File,FileList,FileSystemFileHandle,ArrayBuffer,DataView,Uint8ClampedArray,ImageBitmap,ImageData,Map,Set,CryptoKey".split(",").concat(flatten([8, 16, 32, 64].map(function(num) {
+var intrinsicTypeNames = "BigUint64Array,BigInt64Array,Array,Boolean,String,Date,RegExp,Blob,File,FileList,FileSystemFileHandle,FileSystemDirectoryHandle,ArrayBuffer,DataView,Uint8ClampedArray,ImageBitmap,ImageData,Map,Set,CryptoKey".split(",").concat(flatten([8, 16, 32, 64].map(function(num) {
   return ["Int", "Uint", "Float"].map(function(t) {
     return t + num + "Array";
   });
@@ -1370,7 +1370,7 @@ function tempTransaction(db, mode, storeNames, fn) {
     });
   }
 }
-var DEXIE_VERSION = "3.2.4";
+var DEXIE_VERSION = "3.2.5";
 var maxString = String.fromCharCode(65535);
 var minKey = -Infinity;
 var INVALID_KEY_ARGUMENT = "Invalid key provided. Keys must be of type string, number, Date or Array<string | number | Date>.";
@@ -1448,16 +1448,25 @@ var Table = function() {
     if (keyPaths.length === 1)
       return this.where(keyPaths[0]).equals(indexOrCrit[keyPaths[0]]);
     var compoundIndex = this.schema.indexes.concat(this.schema.primKey).filter(function(ix) {
-      return ix.compound && keyPaths.every(function(keyPath) {
+      if (ix.compound && keyPaths.every(function(keyPath) {
         return ix.keyPath.indexOf(keyPath) >= 0;
-      }) && ix.keyPath.every(function(keyPath) {
-        return keyPaths.indexOf(keyPath) >= 0;
-      });
+      })) {
+        for (var i = 0; i < keyPaths.length; ++i) {
+          if (keyPaths.indexOf(ix.keyPath[i]) === -1)
+            return false;
+        }
+        return true;
+      }
+      return false;
+    }).sort(function(a, b) {
+      return a.keyPath.length - b.keyPath.length;
     })[0];
-    if (compoundIndex && this.db._maxKey !== maxString)
-      return this.where(compoundIndex.name).equals(compoundIndex.keyPath.map(function(kp) {
+    if (compoundIndex && this.db._maxKey !== maxString) {
+      var keyPathsInValidOrder = compoundIndex.keyPath.slice(0, keyPaths.length);
+      return this.where(keyPathsInValidOrder).equals(keyPathsInValidOrder.map(function(kp) {
         return indexOrCrit[kp];
       }));
+    }
     if (!compoundIndex && debug)
       console.warn("The query " + JSON.stringify(indexOrCrit) + " on " + this.name + " would benefit of a " + ("compound index [" + keyPaths.join("+") + "]"));
     var idxByName = this.schema.idxByName;
@@ -3851,7 +3860,7 @@ function dexieOpen(db) {
       throw new exceptions.DatabaseClosed("db.open() was cancelled");
   }
   var resolveDbReady = state.dbReadyResolve, upgradeTransaction = null, wasCreated = false;
-  return DexiePromise.race([openCanceller, (typeof navigator === "undefined" ? DexiePromise.resolve() : idbReady()).then(function() {
+  var tryOpenDB = function() {
     return new DexiePromise(function(resolve4, reject) {
       throwIfCancelled();
       if (!indexedDB2)
@@ -3910,8 +3919,20 @@ function dexieOpen(db) {
           _onDatabaseCreated(db._deps, dbName);
         resolve4();
       }, reject);
+    }).catch(function(err) {
+      if (err && err.name === "UnknownError" && state.PR1398_maxLoop > 0) {
+        state.PR1398_maxLoop--;
+        console.warn("Dexie: Workaround for Chrome UnknownError on open()");
+        return tryOpenDB();
+      } else {
+        return DexiePromise.reject(err);
+      }
     });
-  })]).then(function() {
+  };
+  return DexiePromise.race([
+    openCanceller,
+    (typeof navigator === "undefined" ? DexiePromise.resolve() : idbReady()).then(tryOpenDB)
+  ]).then(function() {
     throwIfCancelled();
     state.onReadyBeingFired = [];
     return DexiePromise.resolve(vip(function() {
