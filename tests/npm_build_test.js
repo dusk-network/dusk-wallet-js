@@ -41,3 +41,18 @@ Deno.test({
     assert(checkIfMade);
   },
 });
+
+Deno.test({
+  name: "console.log hash of the dusk_wallet_core.js",
+  async fn() {
+    const command = new Deno.Command("git", {
+      args: ["hash-object", "./dist/dusk_wallet_core.js"],
+    });
+
+    const output = command.output();
+
+    console.log(output);
+
+    await ensureSuccess(output);
+  },
+});
