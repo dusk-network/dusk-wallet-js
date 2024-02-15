@@ -45,7 +45,7 @@ jobs:
     - name: Run Tests
       run: deno task test
       env:
-        WALLET_CORE_PATH: "./assets/dusk_wallet_core@0.21.9-rc.wasm"
+        WALLET_CORE_PATH: "./assets/dusk_wallet_core@0.21.9-rc.2.wasm"
 
     - name: Stop Docker Container
       run: docker kill rusk
