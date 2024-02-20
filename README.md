@@ -5,7 +5,15 @@ This will be later grafted into js-utils repo
 
 # Guide to use
 
+This library depends on the [wallet-core](https://github.com/dusk-network/wallet-core/) wasm payload. 
+
+You can either use the one provided in the wallet-core repo, or build one yourself. The `WALLET_CORE_PATH` environment variable then needs to be set and point to the `dusk_wallet_core.wasm` WASM file.
+```sh
+WALLET_CORE_PATH=./dist/dusk_wallet_core.wasm
+```
+
 ## Bundling
+
 ```
 ➜ deno task build
 ```
