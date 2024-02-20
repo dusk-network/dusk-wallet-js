@@ -4,7 +4,7 @@
 //
 // Copyright (c) DUSK NETWORK. All rights reserved.
 
-import { getPsks } from "./keys.js";
+import { getPsks, validateAddress } from "./keys.js";
 import { duskToLux } from "./crypto.js";
 import { getBalance } from "./balance.js";
 import { transfer } from "./contracts/transfer.js";
@@ -15,6 +15,7 @@ import { history } from "./history.js";
 import { clearDB } from "./db.js";
 
 import { wasmbytecode, exu } from "../deps.js";
+export { validateAddress };
 
 /**
  * Construct a wallet from this function, this function will load the web assembly into the buffer
