@@ -9,7 +9,7 @@ import { parseEncodedJSON } from "../encoding.js";
 import { luxToDusk } from "../crypto.js";
 import { request, stakeInfo } from "../node.js";
 import { execute } from "../execute.js";
-import { getPsks } from "../keys.js";
+import { Address } from "../address.js";
 
 const PROVER = process.env.CURRENT_PROVER_NODE;
 
@@ -17,8 +17,8 @@ const PROVER = process.env.CURRENT_PROVER_NODE;
  *
  * @param {WebAssembly.Exports} wasm
  * @param {Uint8Array} seed
- * @param {number} sender_index Index of the staker
- * @param {string} refund Where to refund this transaction to
+ * @param {Address} sender address of the staker
+ * @param {Address} refund Where to refund this transaction to
  * @param {number} amount amount to stake
  * @param {number} gasLimit gas limit
  * @param {number} gasPrice gas price
@@ -28,12 +28,13 @@ const PROVER = process.env.CURRENT_PROVER_NODE;
 export async function stake(
   wasm,
   seed,
-  senderIndex,
+  sender,
   refund,
   amount,
   gasLimit,
   gasPrice,
 ) {
+  const senderIndex = sender.index;
   const rng_seed = new Uint8Array(32);
   crypto.getRandomValues(rng_seed);
 
@@ -55,7 +56,7 @@ export async function stake(
   const args = {
     rng_seed: Array.from(rng_seed),
     seed: seed,
-    refund: refund,
+    refund: refund.toString(),
     value: amount,
     sender_index: senderIndex,
     gas_limit: gasLimit,
@@ -131,25 +132,20 @@ export async function stake(
  * Unstake
  * @param {WebAssembly.Exports} wasm
  * @param {Uint8Array} seed
- * @param {number} sender_index Index of the psk to unstake
+ * @param {Address} sender address to unstake
  * @param {string} refund psk to refund this tx to
  * @param {number} gasLimit gas limit
  * @param {number} gasPrice gas price
  *
  * @returns {Promise} Promise object which resolves after the tx gets accepted into the blockchain
  */
-export async function unstake(
-  wasm,
-  seed,
-  sender_index,
-  refund,
-  gasLimit,
-  gasPrice,
-) {
+export async function unstake(wasm, seed, sender, refund, gasLimit, gasPrice) {
+  const senderIndex = sender.index;
+
   const rng_seed = new Uint8Array(32);
   crypto.getRandomValues(rng_seed);
 
-  const info = await stakeInfo(wasm, seed, sender_index);
+  const info = await stakeInfo(wasm, seed, senderIndex);
 
   if (!info.has_staked || info.amount === undefined) {
     throw new Error("Cannot unstake if there's no stake");
@@ -166,9 +162,9 @@ export async function unstake(
   const args = {
     rng_seed: Array.from(rng_seed),
     seed: seed,
-    refund: refund,
+    refund: refund.toString(),
     value: value,
-    sender_index: sender_index,
+    sender_index: senderIndex,
     gas_limit: gasLimit,
     gas_price: gasPrice,
   };
@@ -195,7 +191,7 @@ export async function unstake(
   const bufferWfctProofReq = await wfctProofReq.arrayBuffer();
 
   const callDataArgs = {
-    sender_index: sender_index,
+    sender_index: senderIndex,
     seed: seed,
     unstake_proof: Array.from(new Uint8Array(bufferWfctProofReq)),
     unstake_note: unstakeNote,
@@ -242,25 +238,20 @@ export async function unstake(
  * Allow a staker psk to stake
  * @param {WebAssembly.Exports} wasm
  * @param {Uint8Array} seed
- * @param {number} staker_index the index of the staker who wants to withdraw the reward
+ * @param {Address} Address the staker who wants to withdraw the reward
  * @param {number} gasLimit gas limit
  * @param {number} gasPrice gas price
  *
  * @returns {Promise} Promise object which resolves after the tx gets accepted into the blockchain
  */
-export async function withdrawReward(
-  wasm,
-  seed,
-  staker_index,
-  gasLimit,
-  gasPrice,
-) {
+export async function withdrawReward(wasm, seed, staker, gasLimit, gasPrice) {
+  const stakerIndex = staker.index;
   const rng_seed = new Uint8Array(32);
   crypto.getRandomValues(rng_seed);
 
-  const info = await stakeInfo(wasm, seed, staker_index);
+  const info = await stakeInfo(wasm, seed, stakerIndex);
 
-  const refund = (await getPsks(wasm, seed))[staker_index];
+  const refund = staker;
 
   let counter = 0;
 
@@ -271,9 +262,9 @@ export async function withdrawReward(
   const args = {
     rng_seed: Array.from(rng_seed),
     seed: seed,
-    refund: refund,
-    sender_index: staker_index,
-    owner_index: staker_index,
+    refund: refund.toString(),
+    sender_index: stakerIndex,
+    owner_index: stakerIndex,
     counter: counter,
     gas_limit: gasLimit,
     gas_price: gasPrice,

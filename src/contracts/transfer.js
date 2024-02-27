@@ -11,8 +11,8 @@ import { luxToDusk } from "../crypto.js";
  * Transfer amount from sender to receiver
  * @param {WebAssembly.Exports} wasm
  * @param {Uint8Array} seed
- * @param {string} sender - base58 encoded public spend key of the sender
- * @param {string} receiver - base58 encoded public spend key of the receiver
+ * @param {Address} sender - Address of the sender
+ * @param {Address} receiver - Address of the reciever
  * @param {number} amount - amount to transfer
  * @param {number} gasLimit - gas limit
  * @param {number} gasPrice - gas price
@@ -32,7 +32,7 @@ export async function transfer(
   amount = await luxToDusk(wasm, amount);
 
   const output = {
-    receiver: receiver,
+    receiver: receiver.toString(),
     note_type: "Obfuscated",
     // TODO: generate ref_id(s)
     ref_id: 1,

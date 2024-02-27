@@ -5,6 +5,7 @@
 // Copyright (c) DUSK NETWORK. All rights reserved.
 
 import { Dexie, indexedDB } from "../deps.js";
+import { Address } from "./address.js";
 import { unspentSpentNotes } from "./crypto.js";
 import { request, responseBytes } from "./node.js";
 import { getNullifiersRkyvSerialized } from "./rkyv.js";
@@ -34,7 +35,7 @@ export function NoteData(note, psk, pos, nullifier, block_height) {
 /**
  * @class HistoryData
  * @type {Object}
- * @property {string} psk The bs58 encoded public spend key of the note
+ * @property {Address} psk The address
  * @property {Array<TxData>} history the tx data
  */
 export function HistoryData(psk, history) {
@@ -185,7 +186,7 @@ export async function correctNotes(wasm) {
   // get the nullifiers
   const unspentNotesNullifiersSerialized = await getNullifiersRkyvSerialized(
     wasm,
-    unspentNotesNullifiers
+    unspentNotesNullifiers,
   );
 
   // Fetch existing nullifiers from the node
@@ -193,8 +194,8 @@ export async function correctNotes(wasm) {
     await request(
       unspentNotesNullifiersSerialized,
       "existing_nullifiers",
-      false
-    )
+      false,
+    ),
   );
 
   // calculate the unspent and spent notes
@@ -206,7 +207,7 @@ export async function correctNotes(wasm) {
     unspentNotesNullifiers,
     unspentNotesBlockHeights,
     unspentNotesExistingNullifiersBytes,
-    unspentNotesPsks
+    unspentNotesPsks,
   );
 
   // These are the spent notes which were unspent before
@@ -229,7 +230,8 @@ export async function insertHistory(historyData) {
   historyData.history = existingHistory.history
     .concat(historyData.history)
     .filter(
-      (v, i, a) => a.findIndex((v2) => v2.block_height === v.block_height) === i
+      (v, i, a) =>
+        a.findIndex((v2) => v2.block_height === v.block_height) === i,
     );
 
   await db.cache.put(historyData);
@@ -237,13 +239,14 @@ export async function insertHistory(historyData) {
 
 /**
  *
- * @param {string} psk
+ * @param {Address} psk
  * @returns {HistoryData}
  */
 export async function getHistory(psk) {
   const db = initializeHistory();
 
-  const historyData = (await db.cache.get(psk)) ?? new HistoryData(psk, []);
+  const historyData =
+    (await db.cache.get(psk.toString())) ?? new HistoryData(psk, []);
 
   return historyData;
 }

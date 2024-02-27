@@ -9,6 +9,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - Add the `Gas` class
+- Add tests for the gas class
+- Add address.js file
+- Add `addressses` in `Wallet` class
+- Add tests for new address class
+
+### Changed
+- Acclimate existing code to change with the `address` field in the `Wallet` class
 
 ### Removed
 
@@ -41,3 +48,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 - Ship the web assembly embedded in the library itself
 - During sync only, remove json from web assembly calls and send raw buffers
+
+### Removed
+- Remove mnemonic helper functions

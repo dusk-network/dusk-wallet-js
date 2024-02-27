@@ -13,7 +13,6 @@ import {
 } from "./rkyv.js";
 import { call } from "./wasm.js";
 import { parseEncodedJSON } from "./encoding.js";
-import { getPsks } from "./keys.js";
 import { getUnprovenTxVarBytes, proveTx } from "./tx.js";
 import { waitTillAccept } from "./graphql.js";
 
@@ -25,7 +24,7 @@ const PROVER = process.env.CURRENT_PROVER_NODE;
  * @param {WebAssembly.Exports} wasm
  * @param {Uint8Array} seed - Walconst seed
  * @param {Uint8Array} rng_seed - Seed for the rng
- * @param {string} psk - bs58 encoded public spend key string
+ * @param {Address} psk - Address to execute the transactions for
  * @param {object} output - Output note parameters
  * @param {object} callData - callData.method callData.payload callData.contract
  * @param {object} crossover - crossover.blinder crossover.value crossover.crossover
@@ -47,7 +46,7 @@ export async function execute(
   gas_limit,
   gas_price,
 ) {
-  const sender_index = (await getPsks(wasm, seed)).indexOf(psk);
+  const senderIndex = psk.index;
 
   const notes = await getUnspentNotes(psk);
 
@@ -89,10 +88,10 @@ export async function execute(
     fee: fee,
     rng_seed: Array.from(rng_seed),
     inputs: inputs,
-    refund: psk,
+    refund: psk.toString(),
     output: output,
     openings: openingsSerialized,
-    sender_index: sender_index,
+    sender_index: senderIndex,
     gas_limit: gas_limit,
     gas_price: gas_price,
   };

@@ -8,8 +8,8 @@ import { getAllNotes, insertHistory, getHistory } from "./db.js";
 import { call } from "./wasm.js";
 import { parseEncodedJSON } from "./encoding.js";
 import { txFromBlock } from "./graphql.js";
-import { getPsks } from "./keys.js";
 import { duskToLux } from "./crypto.js";
+import { Address } from "./address.js";
 
 /**
  * Returns the maximum block height within the list of items given.
@@ -26,7 +26,7 @@ import { duskToLux } from "./crypto.js";
 const maxBlockHeight = (items) =>
   items.reduce(
     (max, { block_height }) => (block_height > max ? block_height : max),
-    0
+    0,
   );
 
 /**
@@ -53,7 +53,7 @@ export function TxData(amount, block_height, direction, fee, id, tx_type) {
  *
  * @param {WebAssembly.Exports} wasm
  * @param {Uint8Array} seed
- * @param {string} psk The psk to get the history for
+ * @param {Address} psk The psk to get the history for
  * @returns {Array<TxData>} The history of the transactions
  * @ignore Only called by the Wallet object prototype
  */
@@ -74,7 +74,7 @@ export async function history(wasm, seed, psk) {
 
   const txData = [];
   const noteData = [];
-  const index = (await getPsks(wasm, seed)).indexOf(psk);
+  const index = psk.index;
 
   for (const note of notes) {
     const blockHeight = note.block_height;
@@ -107,13 +107,13 @@ export async function history(wasm, seed, psk) {
     result.history.map(async (tx) => {
       tx.fee = await duskToLux(wasm, parseInt(tx.fee));
       return tx;
-    })
+    }),
   );
 
   const lastBlockHeight = maxBlockHeight(histData);
 
   const historyData = {
-    psk: psk,
+    psk: psk.toString(),
     history: history,
     lastBlockHeight: lastBlockHeight,
   };
