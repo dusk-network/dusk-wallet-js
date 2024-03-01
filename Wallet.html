@@ -216,7 +216,7 @@ and instantiate it, it will block until the web assembly is loaded
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="mod.js.html">mod.js</a>, <a href="mod.js.html#line28">line 28</a>
+        <a href="mod.js.html">mod.js</a>, <a href="mod.js.html#line19">line 19</a>
     </li></ul></dd>
     
 
@@ -373,7 +373,7 @@ and instantiate it, it will block until the web assembly is loaded
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="mod.js.html">mod.js</a>, <a href="mod.js.html#line60">line 60</a>
+        <a href="mod.js.html">mod.js</a>, <a href="mod.js.html#line42">line 42</a>
     </li></ul></dd>
     
 
@@ -431,7 +431,7 @@ and instantiate it, it will block until the web assembly is loaded
     
 
     
-    <h4 class="name" id="getPsks"><span class="type-signature"></span>getPsks<span class="signature">()</span><span class="type-signature"> &rarr; {Array.&lt;string>}</span></h4>
+    <h4 class="name" id="getPsks"><span class="type-signature"></span>getPsks<span class="signature">()</span><span class="type-signature"> &rarr; {Promise.&lt;Array.&lt;string>>}</span></h4>
     
 
     
@@ -483,7 +483,7 @@ and instantiate it, it will block until the web assembly is loaded
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="mod.js.html">mod.js</a>, <a href="mod.js.html#line68">line 68</a>
+        <a href="mod.js.html">mod.js</a>, <a href="mod.js.html#line50">line 50</a>
     </li></ul></dd>
     
 
@@ -523,7 +523,7 @@ and instantiate it, it will block until the web assembly is loaded
     </dt>
     <dd>
         
-<span class="param-type">Array.&lt;string></span>
+<span class="param-type">Promise.&lt;Array.&lt;string>></span>
 
 
     </dd>
@@ -642,7 +642,7 @@ and instantiate it, it will block until the web assembly is loaded
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="mod.js.html">mod.js</a>, <a href="mod.js.html#line241">line 241</a>
+        <a href="mod.js.html">mod.js</a>, <a href="mod.js.html#line191">line 191</a>
     </li></ul></dd>
     
 
@@ -752,7 +752,7 @@ and instantiate it, it will block until the web assembly is loaded
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="mod.js.html">mod.js</a>, <a href="mod.js.html#line249">line 249</a>
+        <a href="mod.js.html">mod.js</a>, <a href="mod.js.html#line199">line 199</a>
     </li></ul></dd>
     
 
@@ -810,7 +810,7 @@ and instantiate it, it will block until the web assembly is loaded
     
 
     
-    <h4 class="name" id="stake"><span class="type-signature"></span>stake<span class="signature">(staker, amount)</span><span class="type-signature"> &rarr; {Promise}</span></h4>
+    <h4 class="name" id="stake"><span class="type-signature">(async) </span>stake<span class="signature">(staker, amount)</span><span class="type-signature"> &rarr; {Promise}</span></h4>
     
 
     
@@ -934,7 +934,7 @@ and instantiate it, it will block until the web assembly is loaded
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="mod.js.html">mod.js</a>, <a href="mod.js.html#line105">line 105</a>
+        <a href="mod.js.html">mod.js</a>, <a href="mod.js.html#line90">line 90</a>
     </li></ul></dd>
     
 
@@ -992,209 +992,7 @@ and instantiate it, it will block until the web assembly is loaded
     
 
     
-    <h4 class="name" id="stakeAllow"><span class="type-signature"></span>stakeAllow<span class="signature">(allowStakePsk, senderPsk<span class="signature-attributes">opt</span>)</span><span class="type-signature"> &rarr; {Promise}</span></h4>
-    
-
-    
-
-
-
-<div class="description">
-    Allow staking dusk from the provided psk
-</div>
-
-
-
-
-
-
-
-
-
-    <h5>Parameters:</h5>
-    
-
-<table class="params">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-        <th>Attributes</th>
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>allowStakePsk</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">string</span>
-
-
-            
-            </td>
-
-            
-                <td class="attributes">
-                
-
-                
-
-                
-                </td>
-            
-
-            
-
-            <td class="description last">psk to allow staking from</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>senderPsk</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">string</span>
-
-
-            
-            </td>
-
-            
-                <td class="attributes">
-                
-                    &lt;optional><br>
-                
-
-                
-
-                
-                </td>
-            
-
-            
-
-            <td class="description last">senderPsk the psk of the sender, if undefined then index 0 (default index) is used</td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="mod.js.html">mod.js</a>, <a href="mod.js.html#line188">line 188</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<h5>Returns:</h5>
-
-        
-<div class="param-desc">
-    promise resolves when stake allow request is obtained
-</div>
-
-
-
-<dl>
-    <dt>
-        Type
-    </dt>
-    <dd>
-        
-<span class="param-type">Promise</span>
-
-
-    </dd>
-</dl>
-
-    
-
-
-
-
-
-        
-            
-
-    
-
-    
-    <h4 class="name" id="stakeInfo"><span class="type-signature"></span>stakeInfo<span class="signature">(psk)</span><span class="type-signature"> &rarr; {Promise.&lt;StakeInfo>}</span></h4>
+    <h4 class="name" id="stakeInfo"><span class="type-signature">(async) </span>stakeInfo<span class="signature">(psk)</span><span class="type-signature"> &rarr; {Promise.&lt;StakeInfo>}</span></h4>
     
 
     
@@ -1295,7 +1093,7 @@ and instantiate it, it will block until the web assembly is loaded
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="mod.js.html">mod.js</a>, <a href="mod.js.html#line141">line 141</a>
+        <a href="mod.js.html">mod.js</a>, <a href="mod.js.html#line126">line 126</a>
     </li></ul></dd>
     
 
@@ -1353,7 +1151,7 @@ and instantiate it, it will block until the web assembly is loaded
     
 
     
-    <h4 class="name" id="sync"><span class="type-signature"></span>sync<span class="signature">()</span><span class="type-signature"> &rarr; {Promise}</span></h4>
+    <h4 class="name" id="sync"><span class="type-signature"></span>sync<span class="signature">(options<span class="signature-attributes">opt</span>)</span><span class="type-signature"> &rarr; {Promise}</span></h4>
     
 
     
@@ -1370,6 +1168,67 @@ and instantiate it, it will block until the web assembly is loaded
 
 
 
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+        <th>Attributes</th>
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>options</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last">Options for the sync</td>
+        </tr>
+
+    
+    </tbody>
+</table>
 
 
 
@@ -1405,7 +1264,7 @@ and instantiate it, it will block until the web assembly is loaded
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="mod.js.html">mod.js</a>, <a href="mod.js.html#line76">line 76</a>
+        <a href="mod.js.html">mod.js</a>, <a href="mod.js.html#line61">line 61</a>
     </li></ul></dd>
     
 
@@ -1610,7 +1469,7 @@ and instantiate it, it will block until the web assembly is loaded
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="mod.js.html">mod.js</a>, <a href="mod.js.html#line87">line 87</a>
+        <a href="mod.js.html">mod.js</a>, <a href="mod.js.html#line72">line 72</a>
     </li></ul></dd>
     
 
@@ -1668,7 +1527,7 @@ and instantiate it, it will block until the web assembly is loaded
     
 
     
-    <h4 class="name" id="unstake"><span class="type-signature"></span>unstake<span class="signature">(unstaker)</span><span class="type-signature"> &rarr; {Promise}</span></h4>
+    <h4 class="name" id="unstake"><span class="type-signature">(async) </span>unstake<span class="signature">(unstaker)</span><span class="type-signature"> &rarr; {Promise}</span></h4>
     
 
     
@@ -1769,7 +1628,7 @@ and instantiate it, it will block until the web assembly is loaded
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="mod.js.html">mod.js</a>, <a href="mod.js.html#line165">line 165</a>
+        <a href="mod.js.html">mod.js</a>, <a href="mod.js.html#line151">line 151</a>
     </li></ul></dd>
     
 
@@ -1827,7 +1686,7 @@ and instantiate it, it will block until the web assembly is loaded
     
 
     
-    <h4 class="name" id="withdrawReward"><span class="type-signature"></span>withdrawReward<span class="signature">(unstaker)</span><span class="type-signature"> &rarr; {Promise}</span></h4>
+    <h4 class="name" id="withdrawReward"><span class="type-signature">(async) </span>withdrawReward<span class="signature">(unstaker)</span><span class="type-signature"> &rarr; {Promise}</span></h4>
     
 
     
@@ -1928,7 +1787,7 @@ and instantiate it, it will block until the web assembly is loaded
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="mod.js.html">mod.js</a>, <a href="mod.js.html#line223">line 223</a>
+        <a href="mod.js.html">mod.js</a>, <a href="mod.js.html#line173">line 173</a>
     </li></ul></dd>
     
 
@@ -1996,13 +1855,13 @@ and instantiate it, it will block until the web assembly is loaded
 </div>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="BalanceInfo.html">BalanceInfo</a></li><li><a href="HistoryData.html">HistoryData</a></li><li><a href="NoteData.html">NoteData</a></li><li><a href="TxData.html">TxData</a></li><li><a href="Wallet.html">Wallet</a></li></ul><h3>Global</h3><ul><li><a href="global.html#arrayMax">arrayMax</a></li><li><a href="global.html#clearDB">clearDB</a></li><li><a href="global.html#generateRandomMnemonic">generateRandomMnemonic</a></li><li><a href="global.html#getHistory">getHistory</a></li><li><a href="global.html#getLastPosIncremented">getLastPosIncremented</a></li><li><a href="global.html#getSeedFromMnemonic">getSeedFromMnemonic</a></li><li><a href="global.html#insertHistory">insertHistory</a></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="BalanceInfo.html">BalanceInfo</a></li><li><a href="HistoryData.html">HistoryData</a></li><li><a href="NoteData.html">NoteData</a></li><li><a href="TxData.html">TxData</a></li><li><a href="Wallet.html">Wallet</a></li></ul><h3>Global</h3><ul><li><a href="global.html#clearDB">clearDB</a></li><li><a href="global.html#getHistory">getHistory</a></li><li><a href="global.html#getNextPos">getNextPos</a></li><li><a href="global.html#insertHistory">insertHistory</a></li><li><a href="global.html#maxBlockHeight">maxBlockHeight</a></li></ul>
 </nav>
 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.2</a> on Mon Jan 08 2024 15:40:18 GMT+0000 (Coordinated Universal Time)
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.2</a> on Fri Mar 01 2024 20:52:12 GMT+0000 (Coordinated Universal Time)
 </footer>
 
 <script> prettyPrint(); </script>
