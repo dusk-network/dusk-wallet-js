@@ -20,13 +20,8 @@
                 };
             import { Wallet } from "../dist/wallet.js";
             // Default wallet seed
-            const seed = [
-                62, 107, 200, 150, 136, 164, 160, 96, 51, 120, 7, 147, 214, 247,
-                92, 129, 153, 233, 162, 121, 45, 209, 233, 4, 196, 182, 194, 50,
-                226, 95, 225, 223, 1, 209, 19, 127, 114, 244, 87, 156, 95, 12,
-                108, 92, 35, 150, 211, 217, 255, 93, 119, 231, 14, 95, 93, 185,
-                216, 108, 32, 89, 33, 225, 58, 184,
-            ];
+            const seed = [218,53,40,82,151,38,73,149,2,121,36,79,61,52,41,146,118,158,174,196,3,171,181,10,36,132,201,182,39,102,212,205,201,221,123,237,43,145,103,94,168,140,208,114,134,127,102,140,14,129,146,92,12,57,54,246,67,11,45,231,72,160,115, 47,
+  ];
 
             let memory;
 
@@ -50,7 +45,7 @@
                 //   memory = exports.memory;
 
                 let wallet = new Wallet(seed);
-                let psks = wallet.getPsks();
+                let psks = await wallet.getPsks();
                 console.log(psks);
 
                 // console.log(getTreeLeafDeserialized(exports, leaf));
@@ -64,6 +59,8 @@
                 console.log(
                     `Call to sync took ${endTime - startTime} milliseconds`,
                 );
+
+                console.log(await wallet.getBalance(psks[0]));
 
                 console.log(await wallet.history(psks[0]));
 

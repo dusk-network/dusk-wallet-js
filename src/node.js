@@ -6,9 +6,9 @@
 
 import { call } from "./wasm.js";
 import { encode, parseEncodedJSON } from "./encoding.js";
-import { getU64RkyvSerialized, getNullifiersRkyvSerialized } from "./rkyv.js";
+import { getNullifiersRkyvSerialized, getU64RkyvSerialized } from "./rkyv.js";
 import { getPublicKeyRkyvSerialized } from "./keys.js";
-import { insertSpentUnspentNotes, getNextPos, correctNotes } from "./db.js";
+import { correctNotes, getNextPos, insertSpentUnspentNotes } from "./db.js";
 import { getOwnedNotes, unspentSpentNotes } from "./crypto.js";
 import { path } from "../deps.js";
 
@@ -19,11 +19,10 @@ const NODE = process.env.CURRENT_NODE;
 // Return a promised rejected if the signal is aborted, resolved otherwise
 const abortable = (signal) =>
   new Promise((resolve, rejected) =>
-    signal?.aborted ? reject(signal.reason) : resolve(signal),
+    signal?.aborted ? rejected(signal.reason) : resolve(signal)
   );
 
 /**
- *
  * @param {boolean} has_key If the user has the key in the allow list or not
  * @param {boolean} has_staked If the user has staked before
  * @param {number} eligiblity The eligiblity if they have staked
@@ -66,6 +65,7 @@ export function StakeInfo(
  */
 export async function sync(wasm, seed, options = {}, node = NODE) {
   const { signal } = options;
+  const leafSize = 632;
 
   // if the signal is already aborted, we reject the promise before doing
   //  anything
@@ -80,7 +80,6 @@ export async function sync(wasm, seed, options = {}, node = NODE) {
   // starts to store its notes from
   const lastPosDB = getNextPos();
   // Get the leafs from the position above
-
   const resp = await request(
     await getU64RkyvSerialized(wasm, lastPosDB),
     "leaves_from_pos",
@@ -89,35 +88,79 @@ export async function sync(wasm, seed, options = {}, node = NODE) {
     node,
   );
 
-  // contains the chunks of the response, at the end of each iteration
-  // it conatains the remaining bytes
-  let buffer = [];
+  const initialRawNoteBufferSize = 1000;
+
+  // contains the rkyv serialized `phoenix_core::Note`
+  let parsedNotes = [];
+  // contains the raw bytes of the notes we recieve from the network
+  let rawNotes = new Uint8Array(initialRawNoteBufferSize);
+  let remainder = [];
+  let lastPos;
+  let nullifiers = [];
+  let psks = [];
+  let blockHeights = [];
 
   for await (const chunk of resp.body) {
     const len = chunk.length;
 
-    for (let i = 0; i < len; i++) {
-      buffer.push(chunk[i]);
+    const notesPerCall = 500;
+    const numberOfNotes = (rawNotes) => Math.ceil(rawNotes.length / leafSize);
+
+    // if the number of notes inside the `notes` array is smaller
+    // than the notesPerCall, we insert more notes inside
+    // the notes array and then we skip the iteration and
+    // don't wait for processing a smaller amount of notes
+    if (numberOfNotes(rawNotes) <= notesPerCall) {
+      const data = new Uint8Array(rawNotes.length + chunk.length);
+
+      data.set(rawNotes);
+      data.set(chunk, rawNotes.length);
+
+      rawNotes = data;
+
+      if (numberOfNotes(rawNotes) < notesPerCall) {
+        continue;
+      }
     }
+    console.log(numberOfNotes(rawNotes));
+    // If the `notes` array has more notes than notesPerCall,
+    // we send it for processing on the web assembly side
+    // so we can calculate notes and their owners
+    await wasm.task(async (exports) => {
+      const fullBytes = new Uint8Array(remainder.length + rawNotes.length);
+
+      fullBytes.set(remainder);
+      fullBytes.set(rawNotes, remainder.length);
+
+      for (let i = 0; i < fullBytes.length; i += notesPerCall) {
+        const bytes = fullBytes.slice(i, i + notesPerCall);
+        const owned = await abortable(signal).then(() =>
+          getOwnedNotes(wasm, seed, bytes)
+        );
+
+        // We use number here because currently wallet-core doesn't know
+        // how to parse json with bigInt since there's no specification for BigInt
+        //
+        // FIXME: We should use bigInt
+        //
+        // See: <https://github.com/dusk-network/dusk-wallet-js/issues/59>
+        const heights = owned.block_heights.split(",").map(Number);
+
+        parsedNotes = parsedNotes.concat(owned.notes);
+        nullifiers = nullifiers.concat(owned.nullifiers);
+        psks = psks.concat(owned.public_spend_keys);
+        blockHeights = blockHeights.concat(heights);
+
+        lastPos = owned.last_pos;
+        remainder = bytes;
+      }
+
+      rawNotes = new Uint8Array(initialRawNoteBufferSize);
+    })();
   }
 
-  const owned = await abortable(signal).then(() =>
-    getOwnedNotes(wasm, seed, buffer),
-  );
-  const notes = owned.notes;
-  const nullifiers = owned.nullifiers;
-  const psks = owned.public_spend_keys;
-  // We use number here because currently wallet-core doesn't know
-  // how to parse json with bigInt since there's no specification for BigInt
-  //
-  // FIXME: We should use bigInt
-  //
-  // See: <https://github.com/dusk-network/dusk-wallet-js/issues/59>
-  const blockHeights = owned.block_heights.split(",").map(Number);
-  const lastPos = owned.last_pos;
-
   const nullifiersSerialized = await abortable(signal).then(() =>
-    getNullifiersRkyvSerialized(wasm, nullifiers),
+    getNullifiersRkyvSerialized(wasm, nullifiers)
   );
 
   // Fetch existing nullifiers from the node
@@ -131,19 +174,19 @@ export async function sync(wasm, seed, options = {}, node = NODE) {
   const allNotes = await abortable(signal).then(() =>
     unspentSpentNotes(
       wasm,
-      notes,
+      parsedNotes,
       nullifiers,
       blockHeights,
       existingNullifiersBytes,
       psks,
-    ),
+    )
   );
 
   const unspentNotes = Array.from(allNotes.unspent_notes);
   const spentNotes = Array.from(allNotes.spent_notes);
 
   await abortable(signal).then(() =>
-    insertSpentUnspentNotes(unspentNotes, spentNotes, lastPos),
+    insertSpentUnspentNotes(unspentNotes, spentNotes, lastPos)
   );
 
   return correctNotes(wasm);

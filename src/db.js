@@ -238,7 +238,7 @@ export async function insertHistory(historyData) {
 /**
  *
  * @param {string} psk
- * @returns {HistoryData}
+ * @returns {Promise<HistoryData>}
  */
 export async function getHistory(psk) {
   const db = initializeHistory();

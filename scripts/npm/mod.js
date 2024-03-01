@@ -5,7 +5,7 @@
 // Copyright (c) DUSK NETWORK. All rights reserved.
 
 import { build, emptyDir } from "https://deno.land/x/dnt/mod.ts";
-import { git, tagVersions, cleanTag } from "./cmd.js";
+import { cleanTag, git, tagVersions } from "./cmd.js";
 
 // Clean the `npm` folder
 await emptyDir("./npm");
