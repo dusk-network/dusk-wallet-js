@@ -4,7 +4,7 @@
 //
 // Copyright (c) DUSK NETWORK. All rights reserved.
 
-import { call, call_raw } from "./wasm.js";
+import { call, call_raw_sync } from "./wasm.js";
 import { parseEncodedJSON } from "./encoding.js";
 /**
  * Get nullifiers for the notes
@@ -28,13 +28,16 @@ export function getNullifiers(wasm, [...seed], [...notes]) {
  * @param {WebAssembly.Exports} - wasm
  * @param {Uint8Array} seed - Seed of the wallet
  * @param {Uint8Array} leaves - leafs we get from the node
- * @returns {object} - object.last_pos, object.owned_notes
+ * @returns {Promise<object>} - object.last_pos, object.owned_notes
  */
-export function getOwnedNotes(wasm, seed, leaves) {
+export function getOwnedNotes(exports, memcpy, seed, leaves) {
   const args = new Uint8Array(seed.length + leaves.length);
   args.set(seed);
   args.set(leaves, seed.length);
-  return call_raw(wasm, args, "check_note_ownership").then(parseEncodedJSON);
+
+  return call_raw_sync(exports, memcpy, args, "check_note_ownership").then(
+    parseEncodedJSON,
+  );
 }
 
 /**
@@ -54,7 +57,7 @@ export function unspentSpentNotes(
   nullifiersOfNote,
   blockHeights,
   existingNullifiers,
-  psks
+  psks,
 ) {
   const args = {
     notes: notes,

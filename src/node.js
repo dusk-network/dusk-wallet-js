@@ -19,7 +19,7 @@ const NODE = process.env.CURRENT_NODE;
 // Return a promised rejected if the signal is aborted, resolved otherwise
 const abortable = (signal) =>
   new Promise((resolve, rejected) =>
-    signal?.aborted ? rejected(signal.reason) : resolve(signal)
+    signal?.aborted ? rejected(signal.reason) : resolve(signal),
   );
 
 /**
@@ -48,6 +48,7 @@ export function StakeInfo(
   this.counter = counter;
   this.epoch = epoch;
 }
+const leafSize = 632;
 
 /**
  * This the most expensive function in this library,
@@ -65,7 +66,6 @@ export function StakeInfo(
  */
 export async function sync(wasm, seed, options = {}, node = NODE) {
   const { signal } = options;
-  const leafSize = 632;
 
   // if the signal is already aborted, we reject the promise before doing
   //  anything
@@ -88,79 +88,77 @@ export async function sync(wasm, seed, options = {}, node = NODE) {
     node,
   );
 
+  const notesPerCall = 200;
+  const workersAlive = navigator.hardwareConcurrency - 4;
   const initialRawNoteBufferSize = 1000;
 
   // contains the rkyv serialized `phoenix_core::Note`
   let parsedNotes = [];
   // contains the raw bytes of the notes we recieve from the network
-  let rawNotes = new Uint8Array(initialRawNoteBufferSize);
+  let rawNotes = [];
   let remainder = [];
   let lastPos;
   let nullifiers = [];
   let psks = [];
   let blockHeights = [];
+  // We keep a cap on the amount of workers we spawn, we wait for the
+  // workers to finish before we spawn more
+  let workers = [];
 
   for await (const chunk of resp.body) {
-    const len = chunk.length;
+    // fill buffer with notes we recieve
+    rawNotes = rawNotes.concat(Array.from(chunk));
 
-    const notesPerCall = 500;
-    const numberOfNotes = (rawNotes) => Math.ceil(rawNotes.length / leafSize);
-
-    // if the number of notes inside the `notes` array is smaller
-    // than the notesPerCall, we insert more notes inside
-    // the notes array and then we skip the iteration and
-    // don't wait for processing a smaller amount of notes
-    if (numberOfNotes(rawNotes) <= notesPerCall) {
-      const data = new Uint8Array(rawNotes.length + chunk.length);
-
-      data.set(rawNotes);
-      data.set(chunk, rawNotes.length);
-
-      rawNotes = data;
-
-      if (numberOfNotes(rawNotes) < notesPerCall) {
-        continue;
+    const numberOfNotes = Math.floor(rawNotes.length / leafSize);
+    // Reasoning for the condition below:
+    // if the number of notes currently in the buffer is less than
+    // the number of notes we should process per WASM call
+    // We insert more notes into the buffer until its equal
+    // too the amount of notes we should process per WASM call
+    //
+    // This allows us to skip iterations where the chunks where notes are
+    // not too many. We don't want to spawn a worker for every chunk (or just 40 notes for example)
+    if (numberOfNotes >= notesPerCall) {
+      // if the number of workers running is equal to the workers we want right now
+      // we wait for them to finish before we spawn more
+      if (workers.length >= workersAlive) {
+        await Promise.allSettled(workers);
+        workers = [];
       }
+
+      // process `notesPerCall` notes at a time
+      const len = notesPerCall * leafSize;
+      const buffer = rawNotes.slice(0, len);
+      console.log(rawNotes.length / leafSize, "notes left");
+      // create the task to process the wasm transaction and run it in the background
+      const task = processNote(wasm, seed, buffer);
+      // push the worker to the workers array so we can wait on it later
+      workers.push(task);
+      // remove the processed notes from the current notes buffer
+      rawNotes = rawNotes.slice(len);
     }
-    console.log(numberOfNotes(rawNotes));
-    // If the `notes` array has more notes than notesPerCall,
-    // we send it for processing on the web assembly side
-    // so we can calculate notes and their owners
-    await wasm.task(async (exports) => {
-      const fullBytes = new Uint8Array(remainder.length + rawNotes.length);
+  }
 
-      fullBytes.set(remainder);
-      fullBytes.set(rawNotes, remainder.length);
+  if (rawNotes.length > 0) {
+    const notesPerCallByteLength = notesPerCall * leafSize;
+    let total = rawNotes.length / leafSize;
 
-      for (let i = 0; i < fullBytes.length; i += notesPerCall) {
-        const bytes = fullBytes.slice(i, i + notesPerCall);
-        const owned = await abortable(signal).then(() =>
-          getOwnedNotes(wasm, seed, bytes)
-        );
-
-        // We use number here because currently wallet-core doesn't know
-        // how to parse json with bigInt since there's no specification for BigInt
-        //
-        // FIXME: We should use bigInt
-        //
-        // See: <https://github.com/dusk-network/dusk-wallet-js/issues/59>
-        const heights = owned.block_heights.split(",").map(Number);
-
-        parsedNotes = parsedNotes.concat(owned.notes);
-        nullifiers = nullifiers.concat(owned.nullifiers);
-        psks = psks.concat(owned.public_spend_keys);
-        blockHeights = blockHeights.concat(heights);
-
-        lastPos = owned.last_pos;
-        remainder = bytes;
+    for (let i = 0; i < rawNotes.length; i += notesPerCallByteLength) {
+      if (workers.length >= workersAlive) {
+        await Promise.allSettled(workers);
+        total = total - notesPerCall;
+        console.log(total, "left");
+        workers = [];
       }
 
-      rawNotes = new Uint8Array(initialRawNoteBufferSize);
-    })();
+      const buffer = rawNotes.slice(i, i + notesPerCallByteLength);
+      const task = processNote(wasm, seed, buffer);
+      workers.push(task);
+    }
   }
 
   const nullifiersSerialized = await abortable(signal).then(() =>
-    getNullifiersRkyvSerialized(wasm, nullifiers)
+    getNullifiersRkyvSerialized(wasm, nullifiers),
   );
 
   // Fetch existing nullifiers from the node
@@ -179,18 +177,45 @@ export async function sync(wasm, seed, options = {}, node = NODE) {
       blockHeights,
       existingNullifiersBytes,
       psks,
-    )
+    ),
   );
 
   const unspentNotes = Array.from(allNotes.unspent_notes);
   const spentNotes = Array.from(allNotes.spent_notes);
 
   await abortable(signal).then(() =>
-    insertSpentUnspentNotes(unspentNotes, spentNotes, lastPos)
+    insertSpentUnspentNotes(unspentNotes, spentNotes, lastPos),
   );
 
   return correctNotes(wasm);
 }
+
+const processNote = (wasm, seed, buffer) => {
+  return wasm.task(async (exports, { memcpy }) => {
+    // const parsedNotes = [];
+    // const nullifiers = [];
+    // const psks = [];
+    // const blockHeights = [];
+    const owned = await getOwnedNotes(exports, memcpy, seed, buffer);
+
+    // We use number here because currently wallet-core doesn't know
+    // how to parse json with bigInt since there's no specification for BigInt
+    //
+    // FIXME: We should use bigInt
+    //
+    // See: <https://github.com/dusk-network/dusk-wallet-js/issues/59>
+    // const heights = owned.block_heights.split(",").map(Number);
+
+    // parsedNotes.push(owned.notes);
+    // nullifiers = nullifiers.concat(owned.nullifiers);
+    // psks = psks.concat(owned.public_spend_keys);
+    // blockHeights = blockHeights.concat(heights);
+
+    // lastPos = owned.last_pos;
+
+    if (owned.notes.length > 0) console.log(owned.notes);
+  })();
+};
 /**
  * By default query the transfer contract unless given otherwise
  * @param {Array<Uint8Array>} data Data that is sent with the request

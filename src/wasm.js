@@ -63,20 +63,24 @@ export const call = (wasm, args, function_name) =>
  */
 export const call_raw = (wasm, args, function_name) =>
   wasm.task(async (exports, { memcpy }) => {
-    const { allocate, free_mem } = exports;
-    const function_call = exports[function_name];
-
-    const { byteLength } = args;
-    const ptr = await allocate(byteLength);
-    await memcpy(ptr, args, byteLength);
-    const call = await function_call(ptr, byteLength);
-    const result = decompose(call);
-
-    if (!result.status) {
-      throw new Error(`Function ${function_name} failed!`);
-    }
-
-    const dest = await memcpy(null, result.ptr, result.length);
-    await free_mem(result.ptr, result.length);
-    return dest;
+    call_raw_sync(exports, memcpy, args, function_name);
   })();
+
+export const call_raw_sync = async (exports, memcpy, args, function_name) => {
+  const { allocate, free_mem } = exports;
+  const function_call = exports[function_name];
+
+  const { byteLength } = args;
+  const ptr = await allocate(byteLength);
+  await memcpy(ptr, args, byteLength);
+  const call = await function_call(ptr, byteLength);
+  const result = decompose(call);
+
+  if (!result.status) {
+    throw new Error(`Function ${function_name} failed!`);
+  }
+
+  const dest = await memcpy(null, result.ptr, result.length);
+  await free_mem(result.ptr, result.length);
+  return dest;
+};
