@@ -216,7 +216,7 @@ and instantiate it, it will block until the web assembly is loaded
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="mod.js.html">mod.js</a>, <a href="mod.js.html#line19">line 19</a>
+        <a href="mod.js.html">mod.js</a>, <a href="mod.js.html#line42">line 42</a>
     </li></ul></dd>
     
 
@@ -373,7 +373,7 @@ and instantiate it, it will block until the web assembly is loaded
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="mod.js.html">mod.js</a>, <a href="mod.js.html#line42">line 42</a>
+        <a href="mod.js.html">mod.js</a>, <a href="mod.js.html#line64">line 64</a>
     </li></ul></dd>
     
 
@@ -483,7 +483,7 @@ and instantiate it, it will block until the web assembly is loaded
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="mod.js.html">mod.js</a>, <a href="mod.js.html#line50">line 50</a>
+        <a href="mod.js.html">mod.js</a>, <a href="mod.js.html#line72">line 72</a>
     </li></ul></dd>
     
 
@@ -642,7 +642,7 @@ and instantiate it, it will block until the web assembly is loaded
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="mod.js.html">mod.js</a>, <a href="mod.js.html#line191">line 191</a>
+        <a href="mod.js.html">mod.js</a>, <a href="mod.js.html#line204">line 204</a>
     </li></ul></dd>
     
 
@@ -752,7 +752,7 @@ and instantiate it, it will block until the web assembly is loaded
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="mod.js.html">mod.js</a>, <a href="mod.js.html#line199">line 199</a>
+        <a href="mod.js.html">mod.js</a>, <a href="mod.js.html#line212">line 212</a>
     </li></ul></dd>
     
 
@@ -810,7 +810,7 @@ and instantiate it, it will block until the web assembly is loaded
     
 
     
-    <h4 class="name" id="stake"><span class="type-signature">(async) </span>stake<span class="signature">(staker, amount)</span><span class="type-signature"> &rarr; {Promise}</span></h4>
+    <h4 class="name" id="stake"><span class="type-signature">(async) </span>stake<span class="signature">(staker, amount, gas<span class="signature-attributes">opt</span>)</span><span class="type-signature"> &rarr; {Promise}</span></h4>
     
 
     
@@ -842,6 +842,8 @@ and instantiate it, it will block until the web assembly is loaded
         <th>Type</th>
 
         
+        <th>Attributes</th>
+        
 
         
 
@@ -867,6 +869,14 @@ and instantiate it, it will block until the web assembly is loaded
             </td>
 
             
+                <td class="attributes">
+                
+
+                
+
+                
+                </td>
+            
 
             
 
@@ -890,10 +900,51 @@ and instantiate it, it will block until the web assembly is loaded
             </td>
 
             
+                <td class="attributes">
+                
+
+                
+
+                
+                </td>
+            
 
             
 
             <td class="description last">Amount of dusk to stake</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>gas</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="Gas.html">Gas</a></span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last">Gas settings for the stake transaction</td>
         </tr>
 
     
@@ -934,7 +985,7 @@ and instantiate it, it will block until the web assembly is loaded
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="mod.js.html">mod.js</a>, <a href="mod.js.html#line90">line 90</a>
+        <a href="mod.js.html">mod.js</a>, <a href="mod.js.html#line114">line 114</a>
     </li></ul></dd>
     
 
@@ -1093,7 +1144,7 @@ and instantiate it, it will block until the web assembly is loaded
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="mod.js.html">mod.js</a>, <a href="mod.js.html#line126">line 126</a>
+        <a href="mod.js.html">mod.js</a>, <a href="mod.js.html#line150">line 150</a>
     </li></ul></dd>
     
 
@@ -1264,7 +1315,7 @@ and instantiate it, it will block until the web assembly is loaded
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="mod.js.html">mod.js</a>, <a href="mod.js.html#line61">line 61</a>
+        <a href="mod.js.html">mod.js</a>, <a href="mod.js.html#line83">line 83</a>
     </li></ul></dd>
     
 
@@ -1322,7 +1373,7 @@ and instantiate it, it will block until the web assembly is loaded
     
 
     
-    <h4 class="name" id="transfer"><span class="type-signature"></span>transfer<span class="signature">(sender, receiver, amount)</span><span class="type-signature"> &rarr; {Promise}</span></h4>
+    <h4 class="name" id="transfer"><span class="type-signature"></span>transfer<span class="signature">(sender, receiver, amount, gas<span class="signature-attributes">opt</span>)</span><span class="type-signature"> &rarr; {Promise}</span></h4>
     
 
     
@@ -1354,6 +1405,8 @@ and instantiate it, it will block until the web assembly is loaded
         <th>Type</th>
 
         
+        <th>Attributes</th>
+        
 
         
 
@@ -1379,6 +1432,14 @@ and instantiate it, it will block until the web assembly is loaded
             </td>
 
             
+                <td class="attributes">
+                
+
+                
+
+                
+                </td>
+            
 
             
 
@@ -1401,6 +1462,14 @@ and instantiate it, it will block until the web assembly is loaded
             
             </td>
 
+            
+                <td class="attributes">
+                
+
+                
+
+                
+                </td>
             
 
             
@@ -1425,10 +1494,51 @@ and instantiate it, it will block until the web assembly is loaded
             </td>
 
             
+                <td class="attributes">
+                
+
+                
+
+                
+                </td>
+            
 
             
 
             <td class="description last">Amount of DUSK to send</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>gas</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="Gas.html">Gas</a></span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last">Gas settings for the transfer transaction</td>
         </tr>
 
     
@@ -1469,7 +1579,7 @@ and instantiate it, it will block until the web assembly is loaded
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="mod.js.html">mod.js</a>, <a href="mod.js.html#line72">line 72</a>
+        <a href="mod.js.html">mod.js</a>, <a href="mod.js.html#line95">line 95</a>
     </li></ul></dd>
     
 
@@ -1527,7 +1637,7 @@ and instantiate it, it will block until the web assembly is loaded
     
 
     
-    <h4 class="name" id="unstake"><span class="type-signature">(async) </span>unstake<span class="signature">(unstaker)</span><span class="type-signature"> &rarr; {Promise}</span></h4>
+    <h4 class="name" id="unstake"><span class="type-signature">(async) </span>unstake<span class="signature">(unstaker, gas<span class="signature-attributes">opt</span>)</span><span class="type-signature"> &rarr; {Promise}</span></h4>
     
 
     
@@ -1559,6 +1669,8 @@ and instantiate it, it will block until the web assembly is loaded
         <th>Type</th>
 
         
+        <th>Attributes</th>
+        
 
         
 
@@ -1584,10 +1696,51 @@ and instantiate it, it will block until the web assembly is loaded
             </td>
 
             
+                <td class="attributes">
+                
+
+                
+
+                
+                </td>
+            
 
             
 
             <td class="description last">bs58 encoded psk to unstake from</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>gas</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="Gas.html">Gas</a></span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last">Gas settings for the unstake transaction</td>
         </tr>
 
     
@@ -1628,7 +1781,7 @@ and instantiate it, it will block until the web assembly is loaded
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="mod.js.html">mod.js</a>, <a href="mod.js.html#line151">line 151</a>
+        <a href="mod.js.html">mod.js</a>, <a href="mod.js.html#line176">line 176</a>
     </li></ul></dd>
     
 
@@ -1686,7 +1839,7 @@ and instantiate it, it will block until the web assembly is loaded
     
 
     
-    <h4 class="name" id="withdrawReward"><span class="type-signature">(async) </span>withdrawReward<span class="signature">(unstaker)</span><span class="type-signature"> &rarr; {Promise}</span></h4>
+    <h4 class="name" id="withdrawReward"><span class="type-signature">(async) </span>withdrawReward<span class="signature">(unstaker, gas<span class="signature-attributes">opt</span>)</span><span class="type-signature"> &rarr; {Promise}</span></h4>
     
 
     
@@ -1718,6 +1871,8 @@ and instantiate it, it will block until the web assembly is loaded
         <th>Type</th>
 
         
+        <th>Attributes</th>
+        
 
         
 
@@ -1743,10 +1898,51 @@ and instantiate it, it will block until the web assembly is loaded
             </td>
 
             
+                <td class="attributes">
+                
+
+                
+
+                
+                </td>
+            
 
             
 
             <td class="description last">bs58 encoded psk to unstake from</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>gas</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="Gas.html">Gas</a></span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last">Gas settings for the withdrawReward transaction</td>
         </tr>
 
     
@@ -1787,7 +1983,7 @@ and instantiate it, it will block until the web assembly is loaded
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="mod.js.html">mod.js</a>, <a href="mod.js.html#line173">line 173</a>
+        <a href="mod.js.html">mod.js</a>, <a href="mod.js.html#line192">line 192</a>
     </li></ul></dd>
     
 
@@ -1855,13 +2051,13 @@ and instantiate it, it will block until the web assembly is loaded
 </div>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="BalanceInfo.html">BalanceInfo</a></li><li><a href="HistoryData.html">HistoryData</a></li><li><a href="NoteData.html">NoteData</a></li><li><a href="TxData.html">TxData</a></li><li><a href="Wallet.html">Wallet</a></li></ul><h3>Global</h3><ul><li><a href="global.html#clearDB">clearDB</a></li><li><a href="global.html#getHistory">getHistory</a></li><li><a href="global.html#getNextPos">getNextPos</a></li><li><a href="global.html#insertHistory">insertHistory</a></li><li><a href="global.html#maxBlockHeight">maxBlockHeight</a></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="BalanceInfo.html">BalanceInfo</a></li><li><a href="Gas.html">Gas</a></li><li><a href="HistoryData.html">HistoryData</a></li><li><a href="NoteData.html">NoteData</a></li><li><a href="TxData.html">TxData</a></li><li><a href="Wallet.html">Wallet</a></li></ul><h3>Global</h3><ul><li><a href="global.html#clearDB">clearDB</a></li><li><a href="global.html#getHistory">getHistory</a></li><li><a href="global.html#getNextPos">getNextPos</a></li><li><a href="global.html#insertHistory">insertHistory</a></li><li><a href="global.html#maxBlockHeight">maxBlockHeight</a></li></ul>
 </nav>
 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.2</a> on Fri Mar 01 2024 20:52:12 GMT+0000 (Coordinated Universal Time)
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.2</a> on Thu Mar 14 2024 13:48:08 GMT+0000 (Coordinated Universal Time)
 </footer>
 
 <script> prettyPrint(); </script>

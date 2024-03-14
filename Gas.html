@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>JSDoc: Class: NoteData</title>
+    <title>JSDoc: Class: Gas</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -17,7 +17,7 @@
 
 <div id="main">
 
-    <h1 class="page-title">Class: NoteData</h1>
+    <h1 class="page-title">Class: Gas</h1>
 
     
 
@@ -28,7 +28,7 @@
 
 <header>
     
-        <h2><span class="attribs"><span class="type-signature"></span></span>NoteData<span class="signature">()</span><span class="type-signature"></span></h2>
+        <h2><span class="attribs"><span class="type-signature"></span></span>Gas<span class="signature">()</span><span class="type-signature"></span></h2>
         
     
 </header>
@@ -41,12 +41,16 @@
     
 
     
-    <h4 class="name" id="NoteData"><span class="type-signature"></span>new NoteData<span class="signature">()</span><span class="type-signature"></span></h4>
+    <h4 class="name" id="Gas"><span class="type-signature"></span>new Gas<span class="signature">()</span><span class="type-signature"></span></h4>
     
 
     
 
 
+
+<div class="description">
+    Construct gas configuration from this class
+</div>
 
 
 
@@ -86,53 +90,7 @@
 
         <tr>
             
-                <td class="name"><code>note</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">UInt8Array</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">The rkyv serialized note.</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>nullifier</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">UInt8Array</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">The rkyv serialized BlsScalar.</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>pos</code></td>
+                <td class="name"><code>limit</code></td>
             
 
             <td class="type">
@@ -148,14 +106,14 @@
 
             
 
-            <td class="description last">The position of the node</td>
+            <td class="description last">The gas limit of the wallet, default is 2900000000</td>
         </tr>
 
     
 
         <tr>
             
-                <td class="name"><code>block_height</code></td>
+                <td class="name"><code>price</code></td>
             
 
             <td class="type">
@@ -171,30 +129,7 @@
 
             
 
-            <td class="description last">The block height of the note</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>psk</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">string</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">The bs58 encoded public spend key of the note</td>
+            <td class="description last">The gas price of the wallet, default is 1</td>
         </tr>
 
     
@@ -233,7 +168,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="db.js.html">db.js</a>, <a href="db.js.html#line17">line 17</a>
+        <a href="mod.js.html">mod.js</a>, <a href="mod.js.html#line18">line 18</a>
     </li></ul></dd>
     
 
