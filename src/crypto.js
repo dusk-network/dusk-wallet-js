@@ -23,21 +23,6 @@ export function getNullifiers(wasm, [...seed], [...notes]) {
 }
 
 /**
- * Check if a note is ownewd by any of the view keys
- * for given seed.
- * @param {WebAssembly.Exports} - wasm
- * @param {Uint8Array} seed - Seed of the wallet
- * @param {Uint8Array} leaves - leafs we get from the node
- * @returns {object} - object.last_pos, object.owned_notes
- */
-export function getOwnedNotes(wasm, seed, leaves) {
-  const args = new Uint8Array(seed.length + leaves.length);
-  args.set(seed);
-  args.set(leaves, seed.length);
-  return call_raw(wasm, args, "check_note_ownership").then(parseEncodedJSON);
-}
-
-/**
  * Sort all the notes into unspent and spent notes given existing nullifiers
  *
  * @param {WebAssembly.Exports} wasm
@@ -54,7 +39,7 @@ export function unspentSpentNotes(
   nullifiersOfNote,
   blockHeights,
   existingNullifiers,
-  psks
+  psks,
 ) {
   const args = {
     notes: notes,

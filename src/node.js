@@ -4,7 +4,7 @@
 //
 // Copyright (c) DUSK NETWORK. All rights reserved.
 
-import { call } from "./wasm.js";
+import { call, call_sync } from "./wasm.js";
 import { encode, parseEncodedJSON } from "./encoding.js";
 import { getU64RkyvSerialized, getNullifiersRkyvSerialized } from "./rkyv.js";
 import { getPublicKeyRkyvSerialized } from "./keys.js";
@@ -16,6 +16,7 @@ import {
 } from "./db.js";
 import { getOwnedNotes, unspentSpentNotes } from "./crypto.js";
 import { path } from "../deps.js";
+import { getLastTransactionBlockHeight } from "./graphql.js";
 
 // env variables
 const TRANSFER_CONTRACT = process.env.TRANSFER_CONTRACT;
@@ -78,7 +79,7 @@ export function StakeInfo(
  * @returns {Promise} Promise that resolves when the sync is done
  */
 export async function sync(wasm, seed, options = {}, node = NODE) {
-  const { signal, from } = options;
+  const { signal, from, onblock } = options;
 
   // if the signal is already aborted, we reject the promise before doing
   //  anything
@@ -122,20 +123,61 @@ export async function sync(wasm, seed, options = {}, node = NODE) {
     }
   }
 
-  const owned = await abortable(signal).then(() =>
-    getOwnedNotes(wasm, seed, buffer),
+  let notes = [];
+  let nullifiers = [];
+  let psks = [];
+  let blockHeights = [];
+  let lastPos = 0;
+
+  const notesPerFunc = 500;
+  const chunkSize = RKYV_TREE_LEAF_SIZE * notesPerFunc;
+
+  // fetch the latest last Pos of the network to calculate sync progress
+
+  const latestBlockHeight = await getLastTransactionBlockHeight();
+  const latestLastPos = await blockHeightToLastPos(
+    wasm,
+    seed,
+    latestBlockHeight,
+    node,
   );
-  const notes = owned.notes;
-  const nullifiers = owned.nullifiers;
-  const psks = owned.public_spend_keys;
-  // We use number here because currently wallet-core doesn't know
-  // how to parse json with bigInt since there's no specification for BigInt
-  //
-  // FIXME: We should use bigInt
-  //
-  // See: <https://github.com/dusk-network/dusk-wallet-js/issues/59>
-  const blockHeights = owned.block_heights.split(",").map(Number);
-  const lastPos = owned.last_pos;
+
+  await wasm.task(async (exports, { memcpy }) => {
+    const { allocate, free_mem } = exports;
+    const function_call = exports["check_note_ownership"];
+
+    for (let i = 0; i < buffer.length; i += chunkSize) {
+      const chunk = buffer.slice(i, i + chunkSize);
+
+      const args = new Uint8Array(seed.length + chunk.length);
+      args.set(seed);
+      args.set(chunk, seed.length);
+
+      const owned = await abortable(signal)
+        .then(() => call_sync(args, function_call, allocate, memcpy, free_mem))
+        .then(parseEncodedJSON);
+
+      notes = notes.concat(owned.notes);
+      nullifiers = nullifiers.concat(owned.nullifiers);
+      psks = psks.concat(owned.public_spend_keys);
+      // We use number here because currently wallet-core doesn't know
+      // how to parse json with bigInt since there's no specification for BigInt
+      //
+      // FIXME: We should use bigInt
+      //
+      // See: <https://github.com/dusk-network/dusk-wallet-js/issues/59>
+      blockHeights = blockHeights.concat(
+        owned.block_heights.split(",").map(Number),
+      );
+      lastPos = owned.last_pos;
+      // estmiate current blockheight
+      const currentBlockHeight = Math.ceil(
+        (lastPos / latestLastPos) * latestBlockHeight,
+      );
+      // report progress
+      onblock(currentBlockHeight, latestBlockHeight);
+    }
+  })();
 
   const nullifiersSerialized = await abortable(signal).then(() =>
     getNullifiersRkyvSerialized(wasm, nullifiers),

@@ -118,3 +118,14 @@ export const getNetworkBlockHeight = () =>
   graphQLRequest("query { block(height: -1) { header { height } }}").then(
     (tx) => tx.block.header.height ?? 0,
   );
+
+/**
+ * Get the block height where last transaction was at
+ * @returns {Promise<number>} - block height
+ */
+export const getLastTransactionBlockHeight = () =>
+  graphQLRequest("query { transactions(last: 1) { blockHeight }}").then(
+    (tx) => {
+      return tx.transactions[0].blockHeight ?? 0;
+    },
+  );

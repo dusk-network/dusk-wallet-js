@@ -57,7 +57,11 @@
 
                 var startTime = performance.now();
 
-                let sync = await wallet.sync();
+                let sync = await wallet.sync({
+                    onblock: (current, final) => {
+                        console.log(current / final + "%");
+                    },
+                });
 
                 var endTime = performance.now();
 
