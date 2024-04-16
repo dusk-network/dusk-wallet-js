@@ -126,6 +126,11 @@ export const getNetworkBlockHeight = () =>
 export const getLastTransactionBlockHeight = () =>
   graphQLRequest("query { transactions(last: 1) { blockHeight }}").then(
     (tx) => {
-      return tx.transactions[0].blockHeight ?? 0;
+      const last = tx.transactions[0];
+      if (last) {
+        return last.blockHeight ?? 0;
+      } else {
+        return 0;
+      }
     },
   );

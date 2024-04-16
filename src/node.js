@@ -175,7 +175,9 @@ export async function sync(wasm, seed, options = {}, node = NODE) {
         (lastPos / latestLastPos) * latestBlockHeight,
       );
       // report progress
-      onblock(currentBlockHeight, latestBlockHeight);
+      if (onblock) {
+        onblock(currentBlockHeight, latestBlockHeight);
+      }
     }
   })();
 
@@ -359,7 +361,7 @@ export async function blockHeightToLastPos(
     // correctness reasons
     return last_pos - 1;
   } else {
-    throw new Error("No last position found");
+    return 0;
   }
 }
 
