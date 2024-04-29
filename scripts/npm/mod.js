@@ -57,7 +57,7 @@ await build({
       name: "fake-indexeddb",
       version: "5.0.1",
     },
-    "https://unpkg.com/dexie/dist/dexie.mjs": {
+    "https://unpkg.com/dexie@3.2.7/dist/dexie.mjs": {
       name: "dexie",
       version: "3.2.7",
     },
