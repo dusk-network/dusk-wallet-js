@@ -39,7 +39,7 @@ export function getNotesRkyvSerialized(wasm, notes) {
  * Convert Array<Uint8Array> into Vec<u8> which is Vec<BlsScalar> rkyv serialized into a Vec<u8>
  * @param {WebAssembly.Exports} wasm
  * @param {Array<any>} bytes The bytes of the Vec<BlsScalar> (nullifiers)
- * @returns {Array<Uint8Array>} rkyv serialized bytes Vec<Vec<u8>>
+ * @returns {Promise<Array<Uint8Array>>} rkyv serialized bytes Vec<Vec<u8>>
  */
 export function getNullifiersRkyvSerialized(wasm, [...bytes]) {
   const args = {
@@ -67,7 +67,7 @@ export async function getNullifiersDeserialized(wasm, [...bytes]) {
  * Convert Array<OpeningsBytes> -> Vec<Openings> -> rkyv serialized Vec<u8>
  * @param {WebAssembly.Exports} wasm
  * @param {Array<Uint8Array>} openings - Array<Bytes> the bytes are rkyv serialized openings
- * @returns {Uint8Array} rkyv serialized Vec<Openings>
+ * @returns {Promise<Uint8Array>} rkyv serialized Vec<Openings>
  */
 export function getOpeningsSerialized(wasm, openings) {
   const args = {

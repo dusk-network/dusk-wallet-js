@@ -6,7 +6,6 @@
 
 import { call } from "./wasm.js";
 import { parseEncodedJSON } from "./encoding.js";
-import { getUnspentNotes } from "./db.js";
 import { getNotesRkyvSerialized } from "./rkyv.js";
 import { duskToLux } from "./crypto.js";
 
@@ -26,14 +25,13 @@ export function BalanceInfo(value, maximum) {
  * @param {WebAssembly.Exports} wasm
  * @param {Uint8Array} seed - Seed for the wallet
  * @param {string} psk - bs58 encoded string of psk of the address
+ * @param {SyncData} syncData - info about notes we get from calling sync
  * @returns {BalanceInfo} The balance info
  *
  * @ignore Ignored because you only call this through the Wallet class
  */
-export async function getBalance(wasm, seed, psk) {
-  const notes = await getUnspentNotes(psk);
-
-  const unspentNotes = notes.map((object) => object.note);
+export async function getBalance(wasm, seed, psk, syncData) {
+  const unspentNotes = syncData.map((a) => a.unspentNotes).map((b) => b.note);
 
   const serializedNotes = await getNotesRkyvSerialized(wasm, unspentNotes);
 

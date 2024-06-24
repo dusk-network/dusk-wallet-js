@@ -4,7 +4,6 @@
 //
 // Copyright (c) DUSK NETWORK. All rights reserved.
 
-import { getUnspentNotes } from "./db.js";
 import { fetchOpenings, request } from "./node.js";
 import {
   getNotesRkyvSerialized,
@@ -30,6 +29,7 @@ const PROVER = process.env.CURRENT_PROVER_NODE;
  * @param {object} callData - callData.method callData.payload callData.contract
  * @param {object} crossover - crossover.blinder crossover.value crossover.crossover
  * @param {any} fee - Fee rkyv serialized
+ * @param {SyncData} syncData - Fee rkyv serialized
  * @param {number} gas_limit - gas_limit value
  * @param {number} gas_price - gas_price value
  *
@@ -44,12 +44,13 @@ export async function execute(
   callData,
   crossover,
   fee,
+  syncData,
   gas_limit,
   gas_price,
 ) {
   const sender_index = (await getPsks(wasm, seed)).indexOf(psk);
 
-  const notes = await getUnspentNotes(psk);
+  const notes = syncData.map((a) => a.unspentNotes);
 
   const openings = [];
   const allNotes = [];

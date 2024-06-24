@@ -11,7 +11,7 @@ import { parseEncodedJSON } from "./encoding.js";
  * Convert a UnprovenTx recieved from execute into bytes we can send to the network
  * @param {WebAssembly.Exports} wasm
  * @param {Uint8Array} bytes - UnprovenTx bytes recieived from calling execute in wasm
- * @returns {Uint8Array} var bytes of unproven tx ready to be sent to the network
+ * @returns {Promise<Uint8Array>} var bytes of unproven tx ready to be sent to the network
  */
 export function getUnprovenTxVarBytes(wasm, [...bytes]) {
   const args = {
@@ -27,7 +27,7 @@ export function getUnprovenTxVarBytes(wasm, [...bytes]) {
  * @param {WebAssembly.Exports} wasm
  * @param {Uint8Array} unproven_tx Bytes of the unprovenTx recieved from the execute call
  * @param {Uint8Array} proof proof recieved from the network
- * @returns {Uint8Array} the proven transaction bytes ready to be sent to the network
+ * @returns {Promise<Uint8Array>} the proven transaction bytes ready to be sent to the network
  */
 export function proveTx(wasm, [...unproven_tx], [...proof]) {
   const args = {

@@ -8,10 +8,10 @@ import { getPsks } from "./keys.js";
 import { duskToLux } from "./crypto.js";
 import { getBalance } from "./balance.js";
 import { transfer } from "./contracts/transfer.js";
-import { sync, stakeInfo } from "./node.js";
+import { stakeInfo } from "./node.js";
+import { sync } from "./sync.js";
 import { stake, unstake, withdrawReward } from "./contracts/stake.js";
 import { history } from "./history.js";
-import { clearDB } from "./db.js";
 import { getNetworkBlockHeight } from "./graphql.js";
 
 import { wasmbytecode, exu } from "../deps.js";
@@ -57,11 +57,12 @@ export class Wallet {
   /**
    * Get balance
    * @param {string} psk - bs58 encoded public spend key of the user we want to
+   * @param {SyncData} syncData - The info about notes belonging to us we get from the sync
    * @returns {Promise<BalanceInfo>} The balance info
    * @memberof Wallet
    */
-  getBalance(psk) {
-    return getBalance(this.wasm, this.seed, psk);
+  getBalance(psk, syncData) {
+    return getBalance(this.wasm, this.seed, psk, syncData);
   }
 
   /**
@@ -88,16 +89,18 @@ export class Wallet {
    * @param {string} sender bs58 encoded Psk to send the dusk from
    * @param {string} receiver bs68 encoded psk of the address who will receive the Dusk
    * @param {number} amount Amount of DUSK to send
+   * @param {SyncData} syncData The info about notes belonging to us we get from the sync
    * @param {Gas} [gas] Gas settings for the transfer transaction
    * @returns {Promise} promise that resolves after the transfer is accepted into blockchain
    */
-  transfer(sender, receiver, amount, gas = new Gas()) {
+  transfer(sender, receiver, amount, syncData, gas = new Gas()) {
     return transfer(
       this.wasm,
       this.seed,
       sender,
       receiver,
       amount,
+      syncData,
       gas.limit,
       gas.price,
     );
@@ -107,10 +110,11 @@ export class Wallet {
    * Stake Dusk from the provided psk, refund to the same psk
    * @param {string} staker bs58 encoded Psk to stake from
    * @param {number} amount Amount of dusk to stake
+   * @param {SyncData} syncData The info about notes belonging to us we get from the sync
    * @param {Gas} [gas] Gas settings for the stake transaction
    * @returns {Promise} promise that resolves after the stake is accepted into blockchain
    */
-  async stake(staker, amount, gas = new Gas()) {
+  async stake(staker, amount, syncData, gas = new Gas()) {
     const minStake = 1000;
     const index = (await this.getPsks()).indexOf(staker);
 
@@ -122,7 +126,7 @@ export class Wallet {
       throw new Error("Staker psk not found");
     }
 
-    const bal = await this.getBalance(staker);
+    const bal = await this.getBalance(staker, syncData);
 
     if (bal.value < minStake) {
       throw new Error(
@@ -135,6 +139,7 @@ export class Wallet {
         index,
         staker,
         amount,
+        syncData,
         gas.limit,
         gas.price,
       );
@@ -169,47 +174,57 @@ export class Wallet {
   /**
    * Unstake dusk from the provided psk, refund to the same psk
    * @param {string} unstaker bs58 encoded psk to unstake from
+   * @param {SyncData} syncData The info about notes belonging to us we get from the sync
    * @param {Gas} [gas] Gas settings for the unstake transaction
    * @returns {Promise} promise that resolves after the unstake is accepted into blockchain
    */
-  async unstake(unstaker, gas = new Gas()) {
+  async unstake(unstaker, syncData, gas = new Gas()) {
     const index = (await this.getPsks()).indexOf(unstaker);
 
     if (index === -1) {
       throw new Error("psk not found");
     }
 
-    return unstake(this.wasm, this.seed, index, unstaker, gas.limit, gas.price);
+    return unstake(
+      this.wasm,
+      this.seed,
+      index,
+      unstaker,
+      syncData,
+      gas.limit,
+      gas.price,
+    );
   }
 
   /**
    * Withdraw reward
    * @param {string} unstaker bs58 encoded psk to unstake from
+   * @param {SyncData} syncData The info about notes belonging to us we get from the sync
    * @param {Gas} [gas] Gas settings for the withdrawReward transaction
    * @returns {Promise} promise that resolves after the unstake is accepted into blockchain
    */
-  async withdrawReward(psk, gas = new Gas()) {
+  async withdrawReward(psk, syncData, gas = new Gas()) {
     const index = (await this.getPsks()).indexOf(psk);
 
-    return withdrawReward(this.wasm, this.seed, index, gas.limit, gas.price);
+    return withdrawReward(
+      this.wasm,
+      this.seed,
+      index,
+      syncData,
+      gas.limit,
+      gas.price,
+    );
   }
 
   /**
    * Get the history of the wallet
    *
    * @param {string} psk - bs58 encoded public spend key of the user we want to fetch the history of
+   * @param {SyncData} syncData - The info about notes belonging to us we get from the sync
    * @returns {Array<TxData>} The history of the wallet
    */
-  history(psk) {
-    return history(this.wasm, this.seed, psk);
-  }
-
-  /**
-   * Reset the state indexedb db and localStorage
-   * @returns {Promise} promise that resolves after the db is reset
-   */
-  reset() {
-    return clearDB();
+  history(psk, syncData) {
+    return history(this.wasm, this.seed, psk, syncData);
   }
 
   /**

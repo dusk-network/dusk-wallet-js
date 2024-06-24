@@ -12,14 +12,14 @@ import { parseEncodedJSON } from "./encoding.js";
  *
  * @param {WebAssembly.Exports} wasm
  * @param {Uint8Array} seed Seed of the walconst
- * @returns {Array<string>} psks base58 encoded public spend keys
+ * @returns {Promise<Array<string>>} psks base58 encoded public spend keys
  */
 export async function getPsks(wasm, seed) {
   const json = {
     seed: Array.from(seed),
   };
 
-  return parseEncodedJSON(await call(wasm, json, "public_spend_keys")).keys;
+  return parseEncodedJSON(await call(wasm, json, "public_keys")).keys;
 }
 
 /**

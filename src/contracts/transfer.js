@@ -14,6 +14,7 @@ import { luxToDusk } from "../crypto.js";
  * @param {string} sender - base58 encoded public spend key of the sender
  * @param {string} receiver - base58 encoded public spend key of the receiver
  * @param {number} amount - amount to transfer
+ * @param {SyncData} syncData The info about notes belonging to us we get from the sync
  * @param {number} gasLimit - gas limit
  * @param {number} gasPrice - gas price
  *
@@ -25,6 +26,7 @@ export async function transfer(
   sender,
   receiver,
   amount,
+  syncData,
   gasLimit,
   gasPrice,
 ) {
@@ -51,6 +53,7 @@ export async function transfer(
     undefined,
     undefined,
     undefined,
+    syncData,
     gasLimit,
     gasPrice,
   );

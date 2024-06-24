@@ -4,7 +4,6 @@
 //
 // Copyright (c) DUSK NETWORK. All rights reserved.
 
-import { getAllNotes, insertHistory, getHistory } from "./db.js";
 import { call } from "./wasm.js";
 import { parseEncodedJSON } from "./encoding.js";
 import { txFromBlock } from "./graphql.js";
@@ -26,7 +25,7 @@ import { duskToLux } from "./crypto.js";
 const maxBlockHeight = (items) =>
   items.reduce(
     (max, { block_height }) => (block_height > max ? block_height : max),
-    0
+    0,
   );
 
 /**
@@ -54,23 +53,14 @@ export function TxData(amount, block_height, direction, fee, id, tx_type) {
  * @param {WebAssembly.Exports} wasm
  * @param {Uint8Array} seed
  * @param {string} psk The psk to get the history for
+ * @param {SyncData} syncData The data we get from the sync
  * @returns {Array<TxData>} The history of the transactions
  * @ignore Only called by the Wallet object prototype
  */
-export async function history(wasm, seed, psk) {
-  let histData = await getHistory(psk);
-
-  const lastInsertedBlockHeight = histData.lastBlockHeight;
-
-  histData = histData.history;
-
-  const notes = await getAllNotes(psk);
-
-  const noteBlockHeights = maxBlockHeight(notes);
-
-  if (lastInsertedBlockHeight >= noteBlockHeights) {
-    return histData;
-  }
+export async function history(wasm, seed, psk, syncData) {
+  const notes = syncData
+    .map((a) => a.unspentNotes)
+    .concat(syncData.map((b) => b.spentNotes));
 
   const txData = [];
   const noteData = [];
@@ -87,7 +77,7 @@ export async function history(wasm, seed, psk) {
 
     noteData.push({
       pos: note.pos,
-      psk: note.psk,
+      pk: note.pk,
       note: note.note,
       nullifier: note.nullifier,
       block_height: note.block_height,
@@ -107,18 +97,8 @@ export async function history(wasm, seed, psk) {
     result.history.map(async (tx) => {
       tx.fee = await duskToLux(wasm, parseInt(tx.fee));
       return tx;
-    })
+    }),
   );
-
-  const lastBlockHeight = maxBlockHeight(histData);
-
-  const historyData = {
-    psk: psk,
-    history: history,
-    lastBlockHeight: lastBlockHeight,
-  };
-
-  await insertHistory(historyData);
 
   return history;
 }

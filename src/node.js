@@ -6,28 +6,13 @@
 
 import { call } from "./wasm.js";
 import { encode, parseEncodedJSON } from "./encoding.js";
-import { getU64RkyvSerialized, getNullifiersRkyvSerialized } from "./rkyv.js";
 import { getPublicKeyRkyvSerialized } from "./keys.js";
-import {
-  insertSpentUnspentNotes,
-  getNextPos,
-  correctNotes,
-  setLastPos,
-  lastPosExists,
-} from "./db.js";
-import { getOwnedNotes, unspentSpentNotes } from "./crypto.js";
 import { path } from "../deps.js";
 
 // env variables
-const TRANSFER_CONTRACT = process.env.TRANSFER_CONTRACT;
-const NODE = process.env.CURRENT_NODE;
-const RKYV_TREE_LEAF_SIZE = process.env.RKYV_TREE_LEAF_SIZE;
-
-// Return a promised rejected if the signal is aborted, resolved otherwise
-const abortable = (signal) =>
-  new Promise((resolve, rejected) =>
-    signal?.aborted ? reject(signal.reason) : resolve(signal),
-  );
+export const TRANSFER_CONTRACT = process.env.TRANSFER_CONTRACT;
+export const NODE = process.env.CURRENT_NODE;
+export const RKYV_TREE_LEAF_SIZE = process.env.RKYV_TREE_LEAF_SIZE;
 
 /**
  *
@@ -57,124 +42,6 @@ export function StakeInfo(
   this.epoch = epoch;
 }
 
-/**
- * Options for the sync function
- * @typedef {Object} SyncOptions
- * @property {AbortSignal} signal The signal to abort the sync
- * @property {number} from The block height to start syncing from
- */
-
-/**
- * This the most expensive function in this library,
- * This function fetches the notes and then persists them
- * to the indexed DB
- *
- * We then use the notes to calculate balance and perform staking
- *
- * @param {WebAssembly.Exports} wasm
- * @param {Uint8Array} seed The seed of the walconst
- * @param {SyncOptions} [options] Options for the sync
- * @param {String} [node] The node to sync from
- *
- * @returns {Promise} Promise that resolves when the sync is done
- */
-export async function sync(wasm, seed, options = {}, node = NODE) {
-  const { signal, from } = options;
-
-  // if the signal is already aborted, we reject the promise before doing
-  //  anything
-  if (signal?.aborted) {
-    throw signal.reason;
-    return;
-  }
-
-  // our last height where we start fetching from
-  // We need to set this number for performance reasons,
-  // every invidudal mnemonic walconst has its own last height where it
-  // starts to store its notes from
-  let position;
-
-  if (typeof from === "number") {
-    if (lastPosExists()) {
-      throw new Error(
-        "Last position already exists, please clear the cache first",
-      );
-    }
-    position = await blockHeightToLastPos(wasm, seed, from, node);
-    // persist the provided position retrieved from the block height
-    setLastPos(position);
-  } else {
-    position = getNextPos();
-  }
-
-  // Get the leafs from the position above
-  const resp = await request(
-    await getU64RkyvSerialized(wasm, position),
-    "leaves_from_pos",
-    true,
-    signal,
-    node,
-  );
-
-  // contains the chunks of the response, at the end of each iteration
-  // it conatains the remaining bytes
-  let buffer = [];
-
-  for await (const chunk of resp.body) {
-    const len = chunk.length;
-
-    for (let i = 0; i < len; i++) {
-      buffer.push(chunk[i]);
-    }
-  }
-
-  const owned = await abortable(signal).then(() =>
-    getOwnedNotes(wasm, seed, buffer),
-  );
-  const notes = owned.notes;
-  const nullifiers = owned.nullifiers;
-  const psks = owned.public_spend_keys;
-  // We use number here because currently wallet-core doesn't know
-  // how to parse json with bigInt since there's no specification for BigInt
-  //
-  // FIXME: We should use bigInt
-  //
-  // See: <https://github.com/dusk-network/dusk-wallet-js/issues/59>
-  const blockHeights = owned.block_heights.split(",").map(Number);
-  const lastPos = owned.last_pos;
-
-  const nullifiersSerialized = await abortable(signal).then(() =>
-    getNullifiersRkyvSerialized(wasm, nullifiers),
-  );
-
-  // Fetch existing nullifiers from the node
-  const existingNullifiersBytes = await request(
-    nullifiersSerialized,
-    "existing_nullifiers",
-    false,
-    signal,
-  ).then(responseBytes);
-
-  const allNotes = await abortable(signal).then(() =>
-    unspentSpentNotes(
-      wasm,
-      notes,
-      nullifiers,
-      blockHeights,
-      existingNullifiersBytes,
-      psks,
-    ),
-  );
-
-  const unspentNotes = Array.from(allNotes.unspent_notes);
-  const spentNotes = Array.from(allNotes.spent_notes);
-
-  await abortable(signal).then(() =>
-    insertSpentUnspentNotes(unspentNotes, spentNotes, lastPos),
-  );
-
-  return correctNotes(wasm);
-}
 /**
  * By default query the transfer contract unless given otherwise
  * @param {Array<Uint8Array>} data Data that is sent with the request
@@ -228,7 +95,7 @@ export function request(
  * Fetch openings from the node
  * @param {number} pos - Position of the note we want the opening of
  * @param {string} node - Node address
- * @returns {Uint8Array} - Bytes of the UInt8Array
+ * @returns {Promise<Uint8Array>} - Bytes of the UInt8Array
  */
 export async function fetchOpenings(pos, node = NODE) {
   return responseBytes(await request(pos, "opening", false, undefined, node));
@@ -281,46 +148,6 @@ export async function stakeInfo(wasm, seed, index) {
  */
 export async function responseBytes(response) {
   return new Uint8Array(await response.arrayBuffer());
-}
-
-/**
- * Helper function to convert a block height to last position
- * @param {Exu.module} wasm
- * @param {Uint8Array} seed
- * @param {number} blockHeight The block height
- * @param {string} [node] The node address
- */
-export async function blockHeightToLastPos(
-  wasm,
-  seed,
-  blockHeight,
-  node = NODE,
-) {
-  const resp = await request(
-    await getU64RkyvSerialized(wasm, blockHeight),
-    "leaves_from_height",
-    true,
-    undefined,
-    node,
-  );
-
-  let firstNote = [];
-
-  for await (const chunk of resp.body) {
-    firstNote = chunk.slice(0, RKYV_TREE_LEAF_SIZE);
-
-    break;
-  }
-
-  const { last_pos } = await getOwnedNotes(wasm, seed, firstNote);
-
-  if (last_pos) {
-    // Decrement last pos by one to be safe, its okay to fetch an extra position for
-    // correctness reasons
-    return last_pos - 1;
-  }
-
-  return 0;
 }
 
 /**

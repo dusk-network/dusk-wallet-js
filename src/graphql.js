@@ -83,7 +83,7 @@ export function waitTillAccept(txHash) {
 /**
  * Get the tx info given the block height from the node
  * @param {number} block_height
- * @returns {Array<object>} - [{raw_tx, gas_spent}]
+ * @returns {Promise<Array<object>>} - [{raw_tx, gas_spent}]
  */
 export async function txFromBlock(block_height) {
   const ret = [];

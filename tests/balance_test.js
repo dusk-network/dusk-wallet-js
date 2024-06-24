@@ -19,10 +19,12 @@ const DEFAULT_SEED = [
 const wallet = new Wallet(DEFAULT_SEED);
 const psks = await wallet.getPsks();
 
-Dexie.dependencies.indexedDB = indexedDB;
+const tempMemoryStore = {
+  unspent: [],
+  spent: [],
+};
 
-// clear the Deno localstorage api to start fresh
-localStorage.clear();
+const store = () => {};
 
 Deno.test({
   name: "test_aborted_sync",

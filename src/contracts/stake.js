@@ -20,6 +20,7 @@ const PROVER = process.env.CURRENT_PROVER_NODE;
  * @param {number} sender_index Index of the staker
  * @param {string} refund Where to refund this transaction to
  * @param {number} amount amount to stake
+ * @param {SyncData} syncData The info about notes belonging to us we get from the sync
  * @param {number} gasLimit gas limit
  * @param {number} gasPrice gas price
  *
@@ -31,6 +32,7 @@ export async function stake(
   senderIndex,
   refund,
   amount,
+  syncData,
   gasLimit,
   gasPrice,
 ) {
@@ -122,6 +124,7 @@ export async function stake(
     callData,
     crossoverType,
     fee,
+    syncData,
     gasLimit,
     gasPrice,
   );
@@ -133,6 +136,7 @@ export async function stake(
  * @param {Uint8Array} seed
  * @param {number} sender_index Index of the psk to unstake
  * @param {string} refund psk to refund this tx to
+ * @param {SyncData} syncData The info about notes belonging to us we get from the sync
  * @param {number} gasLimit gas limit
  * @param {number} gasPrice gas price
  *
@@ -143,6 +147,7 @@ export async function unstake(
   seed,
   sender_index,
   refund,
+  syncData,
   gasLimit,
   gasPrice,
 ) {
@@ -233,6 +238,7 @@ export async function unstake(
     callData,
     crossoverType,
     fee,
+    syncData,
     gasLimit,
     gasPrice,
   );
@@ -243,6 +249,7 @@ export async function unstake(
  * @param {WebAssembly.Exports} wasm
  * @param {Uint8Array} seed
  * @param {number} staker_index the index of the staker who wants to withdraw the reward
+ * @param {SyncData} syncData The info about notes belonging to us we get from the sync
  * @param {number} gasLimit gas limit
  * @param {number} gasPrice gas price
  *
@@ -252,6 +259,7 @@ export async function withdrawReward(
   wasm,
   seed,
   staker_index,
+  syncData,
   gasLimit,
   gasPrice,
 ) {
@@ -306,6 +314,7 @@ export async function withdrawReward(
     callData,
     crossoverType,
     withdrawCallData.fee,
+    syncData,
     gasLimit,
     gasPrice,
   );
