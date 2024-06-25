@@ -9,7 +9,7 @@ import { duskToLux } from "./crypto.js";
 import { getBalance } from "./balance.js";
 import { transfer } from "./contracts/transfer.js";
 import { stakeInfo } from "./node.js";
-import { sync } from "./sync.js";
+import { correctNotes, sync } from "./sync.js";
 import { stake, unstake, withdrawReward } from "./contracts/stake.js";
 import { history } from "./history.js";
 import { getNetworkBlockHeight } from "./graphql.js";
@@ -225,6 +225,14 @@ export class Wallet {
    */
   history(psk, syncData) {
     return history(this.wasm, this.seed, psk, syncData);
+  }
+
+  /**
+   * Filter notes from unspent to spent
+   * @param {NoteData} noteData - The notes we want to correct
+   */
+  correctNotes(notes) {
+    return correctNotes(this.wasm, notes);
   }
 
   /**

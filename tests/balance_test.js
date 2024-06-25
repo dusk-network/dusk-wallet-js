@@ -24,7 +24,12 @@ const tempMemoryStore = {
   spent: [],
 };
 
-const store = () => {};
+const syncDB = (syncData) => {
+  tempMemoryStore.unspent.push(syncData.unspentNotes);
+  tempMemoryStore.spent.push(syncData.spentNotes);
+
+  return wallet.correctNotes(tempMemoryStore.unspent);
+};
 
 Deno.test({
   name: "test_aborted_sync",
@@ -34,7 +39,7 @@ Deno.test({
 
     let synced = false;
 
-    await wallet
+    const syncData = await wallet
       .sync(controller)
       .then(() => (synced = true))
       .catch((e) => {
@@ -53,10 +58,10 @@ Deno.test({
 Deno.test({
   name: "test_balance",
   async fn() {
-    await wallet.sync().then(async () => {
-      const balance = await wallet.getBalance(psks[0]);
-      assertEquals(balance.value, 100000);
-    });
+    const syncData = await wallet.sync();
+    const balance = await wallet.getBalance(psks[0], syncData);
+
+    assertEquals(balance.value, 100000);
   },
   // Those are needed due to `fake-indexedDb` implementation
   sanitizeResources: false,

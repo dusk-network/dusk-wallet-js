@@ -4,7 +4,7 @@
 //
 // Copyright (c) DUSK NETWORK. All rights reserved.
 
-import { NODE, request, RKYV_TREE_LEAF_SIZE } from "./node.js";
+import { NODE, request, RKYV_TREE_LEAF_SIZE, responseBytes } from "./node.js";
 import { getOwnedNotes, unspentSpentNotes } from "./crypto.js";
 import { getU64RkyvSerialized, getNullifiersRkyvSerialized } from "./rkyv.js";
 
@@ -20,12 +20,12 @@ const abortable = (signal) =>
  * @property {position} position The position where to start sync from
  */
 class Bookmark {
-  constructor(position) {
-    this.position = position;
+  constructor(pos) {
+    this.pos = pos;
   }
 
   get position() {
-    return this.position;
+    return this.pos;
   }
 }
 
@@ -82,7 +82,10 @@ export async function sync(wasm, seed, options = {}, node = NODE) {
   }
 
   // our last height where we start fetching from
-  let position = bookmark.position() || 0;
+  let position = 0;
+  if (bookmark) {
+    position = bookmark.position?.();
+  }
 
   if (typeof from === "number") {
     position = await blockHeightToLastPos(wasm, seed, from, node);
@@ -112,6 +115,7 @@ export async function sync(wasm, seed, options = {}, node = NODE) {
   const owned = await abortable(signal).then(() =>
     getOwnedNotes(wasm, seed, buffer),
   );
+
   const notes = owned.notes;
   const nullifiers = owned.nullifiers;
   const psks = owned.public_spend_keys;
@@ -161,7 +165,7 @@ export async function sync(wasm, seed, options = {}, node = NODE) {
  * Check if the notes are spent or not
  *
  * @param {WebAssembly.Exports} wasm
- * @param {Notes} unspentNotes
+ * @param {Array<NoteData>} unspentNotes
  *
  * @returns {Promise<Array<NoteData>>} which notes to move from unspent to spent
  */

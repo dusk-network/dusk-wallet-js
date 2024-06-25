@@ -54,14 +54,14 @@ export function unspentSpentNotes(
   nullifiersOfNote,
   blockHeights,
   existingNullifiers,
-  psks
+  pks,
 ) {
   const args = {
     notes: notes,
     nullifiers_of_notes: nullifiersOfNote,
     block_heights: blockHeights,
     existing_nullifiers: Array.from(existingNullifiers),
-    psks: psks,
+    pks: pks,
   };
   return call(wasm, args, "unspent_spent_notes").then(parseEncodedJSON);
 }
