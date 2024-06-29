@@ -8,6 +8,7 @@ import { call } from "./wasm.js";
 import { encode, parseEncodedJSON } from "./encoding.js";
 import { getPublicKeyRkyvSerialized } from "./keys.js";
 import { path } from "../deps.js";
+import { getNetworkBlockHeight } from "./graphql.js";
 
 // env variables
 export const TRANSFER_CONTRACT = process.env.TRANSFER_CONTRACT;
