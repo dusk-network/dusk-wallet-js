@@ -9,12 +9,14 @@ import { duskToLux } from "./crypto.js";
 import { getBalance } from "./balance.js";
 import { transfer } from "./contracts/transfer.js";
 import { stakeInfo } from "./node.js";
-import { correctNotes, sync } from "./sync.js";
+import { correctNotes, sync, Bookmark } from "./sync.js";
 import { stake, unstake, withdrawReward } from "./contracts/stake.js";
 import { history } from "./history.js";
 import { getNetworkBlockHeight } from "./graphql.js";
 
 import { wasmbytecode, exu } from "../deps.js";
+
+export { Bookmark };
 
 /**
  * Construct gas configuration from this class
@@ -57,7 +59,7 @@ export class Wallet {
   /**
    * Get balance
    * @param {string} psk - bs58 encoded public spend key of the user we want to
-   * @param {SyncData} syncData - The info about notes belonging to us we get from the sync
+   * @param {Array<NoteData>} syncData - The info about notes belonging to us we get from the sync
    * @returns {Promise<BalanceInfo>} The balance info
    * @memberof Wallet
    */
@@ -89,7 +91,7 @@ export class Wallet {
    * @param {string} sender bs58 encoded Psk to send the dusk from
    * @param {string} receiver bs68 encoded psk of the address who will receive the Dusk
    * @param {number} amount Amount of DUSK to send
-   * @param {SyncData} syncData The info about notes belonging to us we get from the sync
+   * @param {Array<NoteData>} syncData The info about notes belonging to us we get from the sync
    * @param {Gas} [gas] Gas settings for the transfer transaction
    * @returns {Promise} promise that resolves after the transfer is accepted into blockchain
    */
@@ -110,7 +112,7 @@ export class Wallet {
    * Stake Dusk from the provided psk, refund to the same psk
    * @param {string} staker bs58 encoded Psk to stake from
    * @param {number} amount Amount of dusk to stake
-   * @param {SyncData} syncData The info about notes belonging to us we get from the sync
+   * @param {Array<NoteData>} syncData The info about notes belonging to us we get from the sync
    * @param {Gas} [gas] Gas settings for the stake transaction
    * @returns {Promise} promise that resolves after the stake is accepted into blockchain
    */
@@ -174,7 +176,7 @@ export class Wallet {
   /**
    * Unstake dusk from the provided psk, refund to the same psk
    * @param {string} unstaker bs58 encoded psk to unstake from
-   * @param {SyncData} syncData The info about notes belonging to us we get from the sync
+   * @param {Array<NoteData>} syncData The info about notes belonging to us we get from the sync
    * @param {Gas} [gas] Gas settings for the unstake transaction
    * @returns {Promise} promise that resolves after the unstake is accepted into blockchain
    */
@@ -199,7 +201,7 @@ export class Wallet {
   /**
    * Withdraw reward
    * @param {string} unstaker bs58 encoded psk to unstake from
-   * @param {SyncData} syncData The info about notes belonging to us we get from the sync
+   * @param {Array<NoteData>} syncData The info about notes belonging to us we get from the sync
    * @param {Gas} [gas] Gas settings for the withdrawReward transaction
    * @returns {Promise} promise that resolves after the unstake is accepted into blockchain
    */
@@ -220,8 +222,8 @@ export class Wallet {
    * Get the history of the wallet
    *
    * @param {string} psk - bs58 encoded public spend key of the user we want to fetch the history of
-   * @param {SyncData} syncData - The info about notes belonging to us we get from the sync
-   * @returns {Array<TxData>} The history of the wallet
+   * @param {{unspent: Array<NoteData>, spent: Array<NoteData>}} syncData - The info about notes belonging to us we get from the sync
+   * @returns {Promise<Array<TxData>>} The history of the wallet
    */
   history(psk, syncData) {
     return history(this.wasm, this.seed, psk, syncData);

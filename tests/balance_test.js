@@ -6,15 +6,15 @@
 
 import { Wallet, Gas } from "../dist/wallet.js"; // url_test.ts
 import { assert, assertEquals, Dexie, indexedDB } from "../deps.js";
+import * as polkadot from "https://deno.land/x/polkadot@0.2.45/util-crypto/mnemonic/bip39.ts";
 
 const PRECISION_DIGITS = 4;
 
-const DEFAULT_SEED = [
-  153, 16, 102, 99, 133, 196, 55, 237, 42, 2, 163, 116, 233, 89, 10, 115, 19,
-  81, 140, 31, 38, 81, 10, 46, 118, 112, 151, 244, 145, 90, 145, 168, 214, 242,
-  68, 123, 116, 76, 223, 56, 200, 60, 188, 217, 34, 113, 55, 172, 27, 255, 184,
-  55, 143, 233, 109, 20, 137, 34, 20, 196, 252, 117, 221, 221,
-];
+const DEFAULT_SEED = Array.from(
+  polkadot.mnemonicToSeedSync(
+    "auction tribe type torch domain caution lyrics mouse alert fabric snake ticket",
+  ),
+);
 
 const wallet = new Wallet(DEFAULT_SEED);
 const psks = await wallet.getPsks();
@@ -22,13 +22,42 @@ const psks = await wallet.getPsks();
 const tempMemoryStore = {
   unspent: [],
   spent: [],
+  bookmark: { position: 0 },
 };
 
-const syncDB = (syncData) => {
-  tempMemoryStore.unspent.push(syncData.unspentNotes);
-  tempMemoryStore.spent.push(syncData.spentNotes);
+const syncDB = async (wallet, from) => {
+  // always sync from previous bookmark
+  let { spent, unspent, bookmark } = await wallet.sync({
+    bookmark: tempMemoryStore.bookmark,
+    from: from,
+  });
 
-  return wallet.correctNotes(tempMemoryStore.unspent);
+  // push the new spent and unspent notes in the db
+  tempMemoryStore.unspent = tempMemoryStore.unspent.concat(unspent);
+  tempMemoryStore.spent = tempMemoryStore.spent.concat(spent);
+
+  // check if old unspent notes were spent
+  const corrected = await wallet.correctNotes(tempMemoryStore.unspent);
+
+  // move notes from unspent to spent
+  tempMemoryStore.unspent = tempMemoryStore.unspent.filter((unspent) => {
+    let keepUnspent = true;
+
+    for (const spentNote of corrected) {
+      if (spentNote.pos === unspent.pos) {
+        // prevent duplicate push
+        tempMemoryStore.spent.push(spentNote);
+        keepUnspent = false;
+
+        break;
+      }
+    }
+
+    return keepUnspent;
+  });
+
+  // update bookmark
+  tempMemoryStore.bookmark = bookmark;
 };
 
 Deno.test({
@@ -39,7 +68,7 @@ Deno.test({
 
     let synced = false;
 
-    const syncData = await wallet
+    await wallet
       .sync(controller)
       .then(() => (synced = true))
       .catch((e) => {
@@ -58,8 +87,8 @@ Deno.test({
 Deno.test({
   name: "test_balance",
   async fn() {
-    const syncData = await wallet.sync();
-    const balance = await wallet.getBalance(psks[0], syncData);
+    await syncDB(wallet);
+    const balance = await wallet.getBalance(psks[0], tempMemoryStore.unspent);
 
     assertEquals(balance.value, 100000);
   },
@@ -79,8 +108,7 @@ Deno.test({
 Deno.test({
   name: "test_transfer",
   async fn() {
-    const balance = await wallet.getBalance(psks[0]);
-    await wallet.transfer(psks[0], psks[1], 4000);
+    await wallet.transfer(psks[0], psks[1], 4000, tempMemoryStore.unspent);
   },
   // Those are needed due to `fake-indexedDb` implementation
   sanitizeResources: false,
@@ -90,13 +118,11 @@ Deno.test({
 Deno.test({
   name: "after_transfer_balance",
   async fn() {
-    await wallet.sync().then(async () => {
-      const balance = await wallet.getBalance(psks[0]);
+    await syncDB(wallet).then(async () => {
+      let balance = await wallet.getBalance(psks[0], tempMemoryStore.unspent);
       assertEquals(balance.value.toFixed(PRECISION_DIGITS), "95999.9997");
-    });
 
-    await wallet.sync().then(async () => {
-      const balance = await wallet.getBalance(psks[1]);
+      balance = await wallet.getBalance(psks[1], tempMemoryStore.unspent);
       assertEquals(balance.value, 4000);
     });
   },
@@ -108,7 +134,7 @@ Deno.test({
   name: "test_stake",
   async fn() {
     // stake for 2000
-    await wallet.stake(psks[1], 2000);
+    await wallet.stake(psks[1], 2000, tempMemoryStore.unspent);
   },
   sanitizeResources: false,
   sanitizeOps: false,
@@ -117,8 +143,8 @@ Deno.test({
 Deno.test({
   name: "after_stake_balance",
   async fn() {
-    await wallet.sync().then(async () => {
-      const balance = await wallet.getBalance(psks[1]);
+    await syncDB(wallet).then(async () => {
+      const balance = await wallet.getBalance(psks[1], tempMemoryStore.unspent);
       assertEquals(Math.round(balance.value), 2000);
     });
   },
@@ -129,7 +155,7 @@ Deno.test({
 Deno.test({
   name: "stake_info",
   async fn() {
-    await wallet.sync();
+    await syncDB(wallet);
     const info = await wallet.stakeInfo(psks[1]);
 
     assertEquals(info.has_staked, true);
@@ -147,7 +173,7 @@ Deno.test({
 Deno.test({
   name: "unstake",
   async fn() {
-    await wallet.unstake(psks[1]);
+    await wallet.unstake(psks[1], tempMemoryStore.unspent);
   },
   sanitizeResources: false,
   sanitizeOps: false,
@@ -156,8 +182,8 @@ Deno.test({
 Deno.test({
   name: "after_unstake_balance",
   async fn() {
-    await wallet.sync().then(async () => {
-      const balance = await wallet.getBalance(psks[1]);
+    await syncDB(wallet).then(async () => {
+      const balance = await wallet.getBalance(psks[1], tempMemoryStore.unspent);
       assertEquals(Math.round(balance.value), 4000);
     });
   },
@@ -169,7 +195,7 @@ Deno.test({
   name: "test_stake_again",
   async fn() {
     // stake for 2000
-    await wallet.stake(psks[1], 2000);
+    await wallet.stake(psks[1], 2000, tempMemoryStore.unspent);
   },
   sanitizeResources: false,
   sanitizeOps: false,
@@ -178,8 +204,8 @@ Deno.test({
 Deno.test({
   name: "after_stake_balance_again",
   async fn() {
-    await wallet.sync().then(async () => {
-      const balance = await wallet.getBalance(psks[1]);
+    await syncDB(wallet).then(async () => {
+      const balance = await wallet.getBalance(psks[1], tempMemoryStore.unspent);
 
       assertEquals(Math.round(balance.value), 2000);
     });
@@ -191,7 +217,7 @@ Deno.test({
 Deno.test({
   name: "withdraw_reward",
   async fn() {
-    await wallet.withdrawReward(psks[0]);
+    await wallet.withdrawReward(psks[0], tempMemoryStore.unspent);
   },
   sanitizeResources: false,
   sanitizeOps: false,
@@ -200,12 +226,11 @@ Deno.test({
 Deno.test({
   name: "balance_after_withdraw_reward",
   async fn() {
-    await wallet.sync().then(async () => {
-      const balance = await wallet.getBalance(psks[0]);
+    await syncDB(wallet).then(async () => {
+      const balance = await wallet.getBalance(psks[0], tempMemoryStore.unspent);
 
       // if something was added to the balance that means the reward was withdrawn
       assert(balance.value > 95999.999);
-      console.log("after withdraw reward balance ok");
     });
   },
   sanitizeResources: false,
@@ -217,43 +242,29 @@ let block_height_tx_start = 0;
 Deno.test({
   name: "tx_history_check",
   async fn() {
-    await wallet.sync().then(async () => {
-      const history = await wallet.history(psks[0]);
-      const firstHeight = parseInt(history[0].block_height, 10);
-      block_height_tx_start = firstHeight;
-
-      assertEquals(history[0].amount.toFixed(PRECISION_DIGITS), "-4000.0003");
-      assertEquals(firstHeight, history[0].block_height);
-      assertEquals(history[0].direction, "Out");
-      assertEquals(history[0].fee.toFixed(PRECISION_DIGITS), "0.0003");
-      assertEquals(history[0].id.length, 64);
-      assertEquals(history[0].tx_type, "TRANSFER");
-
-      assertEquals(parseFloat(history[1].amount, 10), history[1].amount);
-      assertEquals(
-        parseInt(history[1].block_height, 10),
-        history[1].block_height,
-      );
-      assertEquals(history[1].direction, "Out");
-      assertEquals(parseFloat(history[1].fee, 10), history[1].fee);
-      assertEquals(history[1].id.length, 64);
-      assert(history[1].tx_type == "WITHDRAW");
+    const history = await wallet.history(psks[0], {
+      unspent: tempMemoryStore.unspent,
+      spent: tempMemoryStore.spent,
     });
-  },
-  sanitizeResources: false,
-  sanitizeOps: false,
-});
+    const firstHeight = parseInt(history[0].block_height, 10);
+    block_height_tx_start = firstHeight;
 
-Deno.test({
-  name: "reset storage",
-  async fn() {
-    await wallet.reset();
+    assertEquals(history[0].amount.toFixed(PRECISION_DIGITS), "-4000.0003");
+    assertEquals(firstHeight, history[0].block_height);
+    assertEquals(history[0].direction, "Out");
+    assertEquals(history[0].fee.toFixed(PRECISION_DIGITS), "0.0003");
+    assertEquals(history[0].id.length, 64);
+    assertEquals(history[0].tx_type, "TRANSFER");
 
-    assertEquals(localStorage.getItem("lastPos"), null);
-
-    const exists = await Dexie.exists("state");
-
-    assert(!exists);
+    assertEquals(parseFloat(history[1].amount, 10), history[1].amount);
+    assertEquals(
+      parseInt(history[1].block_height, 10),
+      history[1].block_height,
+    );
+    assertEquals(history[1].direction, "Out");
+    assertEquals(parseFloat(history[1].fee, 10), history[1].fee);
+    assertEquals(history[1].id.length, 64);
+    assert(history[1].tx_type == "WITHDRAW");
   },
   sanitizeResources: false,
   sanitizeOps: false,
@@ -264,20 +275,32 @@ const transactions = {};
 Deno.test({
   name: "create dummy transactions",
   async fn() {
-    await wallet.sync().then(async () => {
-      await wallet.transfer(psks[0], psks[1], 2000).then(async () => {
-        await wallet.sync().then(async () => {
-          await wallet.transfer(psks[0], psks[1], 3000).then(async () => {
-            await wallet.sync().then(async () => {
-              await wallet.transfer(psks[0], psks[1], 5000);
-            });
+    await syncDB(wallet).then(async () => {
+      await wallet
+        .transfer(psks[0], psks[1], 2000, tempMemoryStore.unspent)
+        .then(async () => {
+          await syncDB(wallet).then(async () => {
+            await wallet
+              .transfer(psks[0], psks[1], 3000, tempMemoryStore.unspent)
+              .then(async () => {
+                await syncDB(wallet).then(async () => {
+                  await wallet.transfer(
+                    psks[0],
+                    psks[1],
+                    5000,
+                    tempMemoryStore.unspent,
+                  );
+                });
+              });
           });
         });
-      });
     });
 
-    await wallet.sync().then(async () => {
-      const history = await wallet.history(psks[0]);
+    await syncDB(wallet).then(async () => {
+      const history = await wallet.history(psks[0], {
+        unspent: tempMemoryStore.unspent,
+        spent: tempMemoryStore.spent,
+      });
 
       for (const tx of history) {
         transactions[tx.id] = {
@@ -294,16 +317,21 @@ Deno.test({
 Deno.test({
   name: "test sync from particular block height",
   async fn() {
-    await wallet.reset();
+    // reset db
+    tempMemoryStore.unspent = [];
+    tempMemoryStore.spent = [];
+    tempMemoryStore.bookmark = {
+      position: 0,
+    };
 
     const block_height = Object.values(transactions)[2].block_height;
 
-    let syncOptions = {
-      from: block_height,
-    };
-
-    await wallet.sync(syncOptions).then(async () => {
-      const history = await wallet.history(psks[0]);
+    // sync from particular block height
+    await syncDB(wallet, block_height).then(async () => {
+      const history = await wallet.history(psks[0], {
+        unspent: tempMemoryStore.unspent,
+        spent: tempMemoryStore.spent,
+      });
       assertEquals(history[0].block_height, block_height);
       assertEquals(history[1].amount.toFixed(PRECISION_DIGITS), "-3000.0003");
       assertEquals(history[2].amount.toFixed(PRECISION_DIGITS), "-5000.0003");

@@ -61,7 +61,7 @@ export function unspentSpentNotes(
     nullifiers_of_notes: nullifiersOfNote,
     block_heights: blockHeights,
     existing_nullifiers: Array.from(existingNullifiers),
-    pks: pks,
+    psks: pks,
   };
   return call(wasm, args, "unspent_spent_notes").then(parseEncodedJSON);
 }

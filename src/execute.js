@@ -29,7 +29,7 @@ const PROVER = process.env.CURRENT_PROVER_NODE;
  * @param {object} callData - callData.method callData.payload callData.contract
  * @param {object} crossover - crossover.blinder crossover.value crossover.crossover
  * @param {any} fee - Fee rkyv serialized
- * @param {SyncData} syncData - Fee rkyv serialized
+ * @param {Array<NoteData>} noteData - unspent notes
  * @param {number} gas_limit - gas_limit value
  * @param {number} gas_price - gas_price value
  *
@@ -44,18 +44,17 @@ export async function execute(
   callData,
   crossover,
   fee,
-  syncData,
+  noteData,
   gas_limit,
   gas_price,
 ) {
   const sender_index = (await getPsks(wasm, seed)).indexOf(psk);
 
-  const notes = syncData.map((a) => a.unspentNotes);
+  const notes = noteData.filter((note) => note.psk === psk);
 
   const openings = [];
   const allNotes = [];
   const psks = [];
-  const nullifiers = [];
 
   for (const noteData of notes) {
     const pos = noteData.pos;
@@ -74,7 +73,6 @@ export async function execute(
 
     allNotes.push(noteData.note);
     psks.push(noteData.psk);
-    nullifiers.push(noteData.nullifier);
   }
 
   const openingsSerialized = Array.from(
@@ -142,6 +140,5 @@ export async function execute(
     "Chain",
     "2",
   );
-
   return waitTillAccept(txHash);
 }

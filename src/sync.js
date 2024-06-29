@@ -19,7 +19,7 @@ const abortable = (signal) =>
  * @typedef {Bookmark} SyncOptions
  * @property {position} position The position where to start sync from
  */
-class Bookmark {
+export class Bookmark {
   constructor(pos) {
     this.pos = pos;
   }
@@ -83,8 +83,13 @@ export async function sync(wasm, seed, options = {}, node = NODE) {
 
   // our last height where we start fetching from
   let position = 0;
+
   if (bookmark) {
-    position = bookmark.position?.();
+    position = bookmark.position;
+
+    if (position > 0) {
+      position += 1;
+    }
   }
 
   if (typeof from === "number") {
@@ -180,13 +185,13 @@ export async function correctNotes(wasm, notes) {
   // grab all the unspent notes and put the data of those unspent notes in arrays
   const allNotes = notes;
 
-  for (const unspentNote of allNotes) {
+  allNotes.forEach((unspentNote) => {
     notesNullifiers.push(unspentNote.nullifier);
     notesTemp.push(unspentNote.note);
-    notesPsks.push(unspentNote.pk);
+    notesPsks.push(unspentNote.psk);
     notesPos.push(unspentNote.pos);
     notesBlockHeights.push(unspentNote.block_height);
-  }
+  });
 
   // start the correction of the notes
   // get the nullifiers
@@ -200,16 +205,24 @@ export async function correctNotes(wasm, notes) {
     await request(notesNullifiersSerialized, "existing_nullifiers", false),
   );
 
+  // console.log(
+  //   notesTemp,
+  //   notesNullifiers,
+  //   notesBlockHeights,
+  //   unspentNotesExistingNullifiersBytes,
+  //   notesPsks,
+  // );
+
   // calculate the unspent and spent notes
   // from all the unspent note in the db
   // their nullifiers
   const correctedNotes = await unspentSpentNotes(
     wasm,
-    unspentNotesTemp,
+    notesTemp,
     notesNullifiers,
     notesBlockHeights,
     unspentNotesExistingNullifiersBytes,
-    unspentNotesPsks,
+    notesPsks,
   );
 
   // These are the spent notes which were unspent before

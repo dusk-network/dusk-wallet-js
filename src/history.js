@@ -58,9 +58,17 @@ export function TxData(amount, block_height, direction, fee, id, tx_type) {
  * @ignore Only called by the Wallet object prototype
  */
 export async function history(wasm, seed, psk, syncData) {
-  const notes = syncData
-    .map((a) => a.unspentNotes)
-    .concat(syncData.map((b) => b.spentNotes));
+  // remove duplicate notes
+  // TODO: Move this logic to wallet-core
+  const positions = [];
+  const notes = syncData.unspent.concat(syncData.spent).filter((note) => {
+    if (!positions.includes(note.pos)) {
+      positions.push(note.pos);
+      return true && note.psk === psk;
+    } else {
+      return false;
+    }
+  });
 
   const txData = [];
   const noteData = [];
@@ -77,7 +85,7 @@ export async function history(wasm, seed, psk, syncData) {
 
     noteData.push({
       pos: note.pos,
-      pk: note.pk,
+      psk: note.psk,
       note: note.note,
       nullifier: note.nullifier,
       block_height: note.block_height,

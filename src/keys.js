@@ -19,7 +19,7 @@ export async function getPsks(wasm, seed) {
     seed: Array.from(seed),
   };
 
-  return parseEncodedJSON(await call(wasm, json, "public_keys")).keys;
+  return parseEncodedJSON(await call(wasm, json, "public_spend_keys")).keys;
 }
 
 /**

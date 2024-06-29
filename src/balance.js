@@ -25,13 +25,13 @@ export function BalanceInfo(value, maximum) {
  * @param {WebAssembly.Exports} wasm
  * @param {Uint8Array} seed - Seed for the wallet
  * @param {string} psk - bs58 encoded string of psk of the address
- * @param {SyncData} syncData - info about notes we get from calling sync
+ * @param {Array<NoteData>} noteData - info about notes we get from calling sync
  * @returns {BalanceInfo} The balance info
  *
  * @ignore Ignored because you only call this through the Wallet class
  */
-export async function getBalance(wasm, seed, psk, syncData) {
-  const unspentNotes = syncData.map((a) => a.unspentNotes).map((b) => b.note);
+export async function getBalance(wasm, seed, psk, noteData) {
+  const unspentNotes = noteData.filter((b) => b.psk === psk).map((b) => b.note);
 
   const serializedNotes = await getNotesRkyvSerialized(wasm, unspentNotes);
 
