@@ -54,7 +54,7 @@ export function unspentSpentNotes(
   nullifiersOfNote,
   blockHeights,
   existingNullifiers,
-  psks
+  psks,
 ) {
   const args = {
     notes: notes,

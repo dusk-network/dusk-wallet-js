@@ -8,6 +8,7 @@ import { call } from "./wasm.js";
 import { encode, parseEncodedJSON } from "./encoding.js";
 import { getU64RkyvSerialized, getNullifiersRkyvSerialized } from "./rkyv.js";
 import { getPublicKeyRkyvSerialized } from "./keys.js";
+import { SyncScheduler } from "./sync.js";
 import {
   insertSpentUnspentNotes,
   getNextPos,
@@ -92,11 +93,16 @@ class SyncError extends Error {
 export async function sync(wasm, seed, options = {}, node = NODE) {
   const { signal, from } = options;
 
+  let onblock = options.onblock;
+
   // if the signal is already aborted, we reject the promise before doing
   //  anything
   if (signal?.aborted) {
     throw signal.reason;
     return;
+  }
+  if (typeof onblock != "function") {
+    onblock = () => {};
   }
 
   // our last height where we start fetching from
@@ -106,6 +112,8 @@ export async function sync(wasm, seed, options = {}, node = NODE) {
   let position = getNextPos();
   // the points are from the github issue https://github.com/dusk-network/dusk-wallet-js/issues/93#issuecomment-2107632916
   const currentlastPos = lastPosExists();
+  const networkLastPos = await num_notes(node);
+  const networkBlockHeight = await getNetworkBlockHeight();
 
   if (typeof from === "number") {
     if (from <= 0) {
@@ -119,10 +127,7 @@ export async function sync(wasm, seed, options = {}, node = NODE) {
     } else {
       // point 7
       if (!currentlastPos) {
-        const blockHeight = Math.max(
-          0,
-          Math.min(from, await getNetworkBlockHeight()),
-        );
+        const blockHeight = Math.max(0, Math.min(from, networkBlockHeight));
 
         position = await blockHeightToLastPos(wasm, seed, blockHeight, node);
       } else {
@@ -163,20 +168,31 @@ export async function sync(wasm, seed, options = {}, node = NODE) {
     }
   }
 
-  const owned = await abortable(signal).then(() =>
-    getOwnedNotes(wasm, seed, buffer),
-  );
-  const notes = owned.notes;
-  const nullifiers = owned.nullifiers;
-  const psks = owned.public_spend_keys;
-  // We use number here because currently wallet-core doesn't know
-  // how to parse json with bigInt since there's no specification for BigInt
-  //
-  // FIXME: We should use bigInt
-  //
-  // See: <https://github.com/dusk-network/dusk-wallet-js/issues/59>
-  const blockHeights = owned.block_heights.split(",").map(Number);
-  const lastPos = owned.last_pos;
+  const manager = new SyncScheduler(Number(networkLastPos), networkBlockHeight);
+  // notes * num_of_threads notes per function
+  const bytesPerFunction = 632 * 10 * SyncScheduler.concurrency;
+  const total = buffer.length / bytesPerFunction;
+
+  for (let i = 0; i < total; i++) {
+    const slice = buffer.slice(
+      bytesPerFunction * i,
+      bytesPerFunction * (i + 1),
+    );
+
+    await manager.add_flush(
+      abortable(signal).then(() => getOwnedNotes(wasm, seed, slice)),
+      onblock,
+    );
+  }
+
+  // flush the remaining notes
+  await manager.flush(onblock);
+
+  const blockHeights = manager.blockHeights;
+  const lastPos = manager.lastPos;
+  const notes = manager.notes;
+  const psks = manager.pks;
+  const nullifiers = manager.nullifiers;
 
   const nullifiersSerialized = await abortable(signal).then(() =>
     getNullifiersRkyvSerialized(wasm, nullifiers),
@@ -359,6 +375,15 @@ export async function blockHeightToLastPos(
 }
 
 /**
+ * Fetch the number of notes from the node
+ */
+async function num_notes(node = NODE) {
+  return bytesToBigInt(
+    await responseBytes(await request([], "num_notes", false, undefined, node)),
+  );
+}
+
+/**
  * Seerialize a number to a little endian byte array
  * @param {number} number to serialize
  * @returns {Uint8Array} the bytes
@@ -369,4 +394,15 @@ function u32toLE(num) {
   view.setUint32(0, num, true);
 
   return data;
+}
+
+/**
+ * Convert bytes to a big int, assume little endian
+ * @param {Uint8Array} bytes
+ * @returns {BigInt} the big int
+ */
+function bytesToBigInt(bytes) {
+  const view = new DataView(bytes.buffer);
+
+  return view.getBigUint64(0, true);
 }

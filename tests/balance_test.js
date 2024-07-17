@@ -346,12 +346,31 @@ Deno.test({
   },
 });
 
+const networkBlockHeight = await Wallet.networkBlockHeight;
+
 Deno.test({
   name: "check latest network block height",
   async fn() {
-    const blockHeight = await Wallet.networkBlockHeight;
-
-    assert(!isNaN(blockHeight));
-    assert(blockHeight > 10);
+    assert(!isNaN(networkBlockHeight));
+    assert(networkBlockHeight > 10);
   },
+});
+
+Deno.test({
+  name: "test sync on block",
+  async fn() {
+    await wallet.reset();
+
+    let syncOptions = {
+      from: 0,
+      onblock: (current, final) => {
+        assertEquals(final, networkBlockHeight);
+        assertEquals(typeof current, "number");
+      },
+    };
+
+    await wallet.sync(syncOptions);
+  },
+  sanitizeResources: false,
+  sanitizeOps: false,
 });

@@ -56,11 +56,13 @@
                 // console.log(getTreeLeafDeserialized(exports, leaf));
 
                 var startTime = performance.now();
-                const network = await Wallet.networkBlockHeight;
-                console.log(network);
+                const onblock = (current, final) => {
+                    console.log(`progress ${(current / final) * 100} `);
+                };
 
                 let sync = await wallet.sync({
-                    from: network,
+                    from: 0,
+                    onblock: onblock,
                 });
 
                 var endTime = performance.now();
@@ -70,8 +72,6 @@
                 );
 
                 console.log(await wallet.history(psks[0]));
-
-                wallet.reset();
 
                 console.log(await Wallet.networkBlockHeight);
 
