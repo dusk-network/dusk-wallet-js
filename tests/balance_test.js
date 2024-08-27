@@ -127,7 +127,7 @@ Deno.test({
     const info = await wallet.stakeInfo(psks[1]);
 
     assertEquals(info.has_staked, true);
-    assertEquals(parseInt(info.eligiblity, 10), info.eligiblity);
+    assertEquals(parseInt(info.eligibility, 10), info.eligibility);
     assertEquals(info.amount, 2000);
     assertEquals(info.reward, 0);
     assertEquals(parseInt(info.epoch), info.epoch);

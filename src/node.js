@@ -35,7 +35,7 @@ const abortable = (signal) =>
  *
  * @param {boolean} has_key If the user has the key in the allow list or not
  * @param {boolean} has_staked If the user has staked before
- * @param {number} eligiblity The eligiblity if they have staked
+ * @param {number} eligibility The eligibility if they have staked
  * @param {number} amount The amount staked
  * @param {number} reward The reward of the stake
  * @param {number} counter The number of transactions done by the user
@@ -44,7 +44,7 @@ const abortable = (signal) =>
 export function StakeInfo(
   has_key,
   has_staked,
-  eligiblity,
+  eligibility,
   amount,
   reward,
   counter,
@@ -52,7 +52,7 @@ export function StakeInfo(
 ) {
   this.has_key = has_key;
   this.has_staked = has_staked;
-  this.eligiblity = eligiblity;
+  this.eligibility = eligibility;
   this.amount = amount;
   this.reward = reward;
   this.counter = counter;
