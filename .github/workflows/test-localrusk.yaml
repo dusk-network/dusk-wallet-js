@@ -31,6 +31,13 @@ jobs:
         echo "address = 'oCqYsUMRqpRn2kSabH52Gt6FQCwH5JXj5MtRdYVtjMSJ73AFvdbPf98p3gz98fQwNy9ZBiDem6m9BivzURKFSKLYWP3N9JahSPZs9PnZ996P18rTGAjQTNFsxtbrKx79yWu'" >> genesis.toml
         echo "amount = 1_000_000_000_000" >> genesis.toml
 
+    - name: Add dependencies
+      run: |
+        sudo apt-get update
+        # Download and install
+        curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs/ | sh
+        source $HOME/.cargo/env
+        sudo apt-get install clang
     - name: Run rusk 
       run: |
         DUSK_CONSENSUS_KEYS_PASS=password cargo r --release -p /var/opt/rusk-artifacts/rusk -- -c ./genesis.toml
