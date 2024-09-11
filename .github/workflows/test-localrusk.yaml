@@ -33,7 +33,7 @@ jobs:
 
     - name: Run rusk 
       run: |
-        /var/opt/rusk-artifacts/rusk -d -p 9000:9000/udp -p 8080:8080/tcp -v ./genesis.toml
+        DUSK_CONSENSUS_KEYS_PASS=password cargo r --release -p /var/opt/rusk-artifacts/rusk -- -c ./genesis.toml
 
     - name: Install Deno
       uses: denoland/setup-deno@v1
