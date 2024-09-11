@@ -33,11 +33,11 @@ jobs:
 
     - name: Add dependencies
       run: |
-        sudo apt-get update
+        apt-get update
         # Download and install
         curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs/ | sh
         source $HOME/.cargo/env
-        sudo apt-get install clang
+        apt-get install clang
     - name: Run rusk 
       run: |
         DUSK_CONSENSUS_KEYS_PASS=password cargo r --release -p /var/opt/rusk-artifacts/rusk -- -c ./genesis.toml
